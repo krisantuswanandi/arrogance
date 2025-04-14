@@ -1,9 +1,11 @@
 <template>
-  <div class="bg-gray-50 w-full max-w-xl m-auto min-h-dvh">
-    <AppHeader />
-    <AppNav />
-    <div class="p-4">
-      <NuxtPage />
+  <UApp>
+    <div class="bg-gray-50 w-full max-w-xl m-auto min-h-dvh">
+      <AppHeader />
+      <AppNav />
+      <div class="p-4">
+        <NuxtPage />
+      </div>
     </div>
-  </div>
+  </UApp>
 </template>

@@ -17,11 +17,15 @@ export const useProfileStore = defineStore("profile", () => {
     )!;
   });
 
-  function add(name: string) {
+  function add(name: string, setActive?: boolean) {
     const id = crypto.randomUUID();
     profiles.value.push({ id, name });
 
     if (!activeProfileId.value) {
+      activeProfileId.value = id;
+    }
+
+    if (setActive) {
       activeProfileId.value = id;
     }
   }

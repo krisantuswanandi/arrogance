@@ -4,7 +4,7 @@ const name = ref("");
 const modalOpen = ref(false);
 
 function addProfile() {
-  if (name.value === "") return;
+  if (!name.value) return;
 
   profileStore.add(name.value);
   name.value = "";
@@ -21,13 +21,10 @@ function addProfile() {
     >
       <UButton>Create new profile</UButton>
       <template #body>
-        <form
-          id="form"
-          class="flex items-center gap-4"
-          @submit.prevent="addProfile"
-        >
-          <label for="abc" class="text-sm">Profile name</label>
-          <UInput id="abc" v-model="name" class="flex-1" />
+        <form id="form" @submit.prevent="addProfile">
+          <UFormField label="Profile name">
+            <UInput v-model="name" class="w-full" />
+          </UFormField>
         </form>
       </template>
       <template #footer>

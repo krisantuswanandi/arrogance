@@ -4,7 +4,7 @@ const name = ref("");
 const modalOpen = ref(false);
 
 function addExercise() {
-  if (name.value === "") return;
+  if (!name.value) return;
 
   exerciseStore.add(name.value);
   name.value = "";
@@ -21,13 +21,10 @@ function addExercise() {
     >
       <UButton>Add new exercise</UButton>
       <template #body>
-        <form
-          id="form"
-          class="flex items-center gap-4"
-          @submit.prevent="addExercise"
-        >
-          <label for="abc" class="text-sm">Exercise name</label>
-          <UInput id="abc" v-model="name" class="flex-1" />
+        <form id="form" @submit.prevent="addExercise">
+          <UFormField label="Exercise name">
+            <UInput v-model="name" class="w-full" />
+          </UFormField>
         </form>
       </template>
       <template #footer>

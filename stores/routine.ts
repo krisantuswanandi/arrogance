@@ -19,6 +19,13 @@ export const useRoutineStore = defineStore("routine", () => {
     }
   }
 
+  function updateExercises(routineId: string, exerciseIds: string[]) {
+    const routine = routines.value.find((routine) => routine.id === routineId);
+    if (routine) {
+      routine.exerciseIds = exerciseIds;
+    }
+  }
+
   const routinesWithExercises = computed(() => {
     const exerciseStore = useExerciseStore();
     const exercises = exerciseStore.exercises;
@@ -43,6 +50,7 @@ export const useRoutineStore = defineStore("routine", () => {
   return {
     routines: routinesWithExercises,
     add,
+    updateExercises,
     remove,
   };
 });

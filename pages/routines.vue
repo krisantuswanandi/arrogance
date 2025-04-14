@@ -4,24 +4,38 @@ const exerciseStore = useExerciseStore();
 
 const name = ref("");
 const exercises = ref<string[]>([]);
-const modalOpen = ref(false);
+const modalRoutineOpen = ref(false);
+const selectedRoutine = ref("");
+const modalExerciseOpen = computed(() => !!selectedRoutine.value);
 
 function addRoutine() {
-  if (name.value === "" || exercises.value.length === 0) {
-    return;
-  }
+  if (!name.value || !exercises.value.length) return;
 
   routineStore.add(name.value, exercises.value);
   name.value = "";
   exercises.value = [];
-  modalOpen.value = false;
+  modalRoutineOpen.value = false;
+}
+
+function addExercises() {
+  if (!selectedRoutine.value) return;
+  if (!exercises.value.length) return;
+
+  routineStore.updateExercises(selectedRoutine.value, exercises.value);
+  exercises.value = [];
+  selectedRoutine.value = "";
+}
+
+function selectRoutine(routineId: string, existingExercises: string[]) {
+  selectedRoutine.value = routineId;
+  exercises.value = existingExercises;
 }
 </script>
 
 <template>
   <div>
     <UModal
-      v-model:open="modalOpen"
+      v-model:open="modalRoutineOpen"
       title="New routine"
       :ui="{ footer: 'justify-end' }"
     >
@@ -44,28 +58,80 @@ function addRoutine() {
         </form>
       </template>
       <template #footer>
-        <UButton variant="outline" color="neutral" @click="modalOpen = false">
+        <UButton
+          variant="outline"
+          color="neutral"
+          @click="modalRoutineOpen = false"
+        >
+          Cancel
+        </UButton>
+        <UButton type="submit" form="form">Save</UButton>
+      </template>
+    </UModal>
+    <UModal
+      v-model:open="modalExerciseOpen"
+      title="Update exercises"
+      :ui="{ footer: 'justify-end' }"
+    >
+      <template #body>
+        <form id="form" @submit.prevent="addExercises">
+          <UFormField label="Exercises">
+            <USelectMenu
+              v-model="exercises"
+              class="w-full"
+              label-key="name"
+              value-key="id"
+              multiple
+              :items="exerciseStore.exercises"
+            />
+          </UFormField>
+        </form>
+      </template>
+      <template #footer>
+        <UButton
+          variant="outline"
+          color="neutral"
+          @click="selectedRoutine = ''"
+        >
           Cancel
         </UButton>
         <UButton type="submit" form="form">Save</UButton>
       </template>
     </UModal>
     <ul class="mt-8">
-      <li v-for="i in routineStore.routines" :key="i.id" class="mt-8">
-        <div class="flex justify-between">
-          <span class="font-bold">{{ i.name }}</span>
+      <li
+        v-for="routine in routineStore.routines"
+        :key="routine.id"
+        class="mt-8"
+      >
+        <div class="p-2 border border-gray-300 rounded">
+          <div class="flex justify-between">
+            <span class="font-bold">{{ routine.name }}</span>
+            <UButton
+              variant="link"
+              color="error"
+              @click="routineStore.remove(routine.id)"
+            >
+              Delete
+            </UButton>
+          </div>
+          <ol v-if="routine.exercises.length" class="my-2">
+            <li v-for="exercise in routine.exercises" :key="exercise.id">
+              <span>{{ exercise.name }}</span>
+            </li>
+          </ol>
           <UButton
-            variant="link"
-            color="error"
-            @click="routineStore.remove(i.id)"
-            >Delete</UButton
+            class="mt-2"
+            @click="
+              selectRoutine(
+                routine.id,
+                routine.exercises.map((e) => e.id)
+              )
+            "
           >
+            Update exercises
+          </UButton>
         </div>
-        <ol>
-          <li v-for="j in i.exercises" :key="j.id">
-            <span>{{ j.name }}</span>
-          </li>
-        </ol>
       </li>
     </ul>
   </div>
