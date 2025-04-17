@@ -3,6 +3,8 @@ import type { DropdownMenuItem } from "@nuxt/ui";
 
 const routineStore = useRoutineStore();
 const exerciseStore = useExerciseStore();
+const activeSessionStore = useActiveSessionStore();
+const router = useRouter();
 
 const routineName = ref("");
 const routineExercises = ref<string[]>([]);
@@ -22,18 +24,28 @@ const routineOptions = computed<DropdownMenuItem[][]>(() => {
   if (!routineStore.routines.length) return [defaultRoutineOptions];
 
   return [
-    routineStore.routines.map((routine) => ({ label: routine.name })),
+    routineStore.routines.map((routine) => ({
+      label: routine.name,
+      onSelect() {
+        startNewSession(
+          routine.name,
+          routine.exercises.map((e) => e.id)
+        );
+      },
+    })),
     defaultRoutineOptions,
   ];
 });
 
-function addRoutine() {
+function onNewRoutine() {
   if (!routineName.value || !routineExercises.value.length) return;
 
-  routineStore.add(routineName.value, routineExercises.value);
-  routineName.value = "";
-  routineExercises.value = [];
-  modalRoutineOpen.value = false;
+  startNewSession(routineName.value, routineExercises.value);
+}
+
+function startNewSession(name: string, exercises: string[]) {
+  activeSessionStore.startNewSession(name, exercises);
+  router.push("/active-session");
 }
 </script>
 
@@ -45,7 +57,7 @@ function addRoutine() {
       :ui="{ footer: 'justify-end' }"
     >
       <template #body>
-        <form id="form" @submit.prevent="addRoutine">
+        <form id="form" @submit.prevent="onNewRoutine">
           <UFormField label="Routine name">
             <UInput v-model="routineName" class="w-full" />
           </UFormField>

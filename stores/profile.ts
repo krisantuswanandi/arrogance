@@ -4,10 +4,7 @@ interface Profile {
 }
 
 export const useProfileStore = defineStore("profile", () => {
-  const profiles = ref<Profile[]>([
-    { id: "1", name: "John Doe" },
-    { id: "2", name: "Jane Doe" },
-  ]);
+  const profiles = ref<Profile[]>([{ id: "1", name: "Default" }]);
 
   const activeProfileId = ref("1");
 

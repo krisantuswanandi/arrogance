@@ -1,56 +1,31 @@
 <script setup lang="ts">
+const activeSessionStore = useActiveSessionStore();
 const exerciseStore = useExerciseStore();
 
-interface Set {
-  weight: number;
-  reps: number;
-}
+const newExercises = ref<string[]>([]);
 
-interface Exercise {
-  id: string;
-  name: string;
-  sets: Set[];
-}
+function addExercises() {
+  if (!newExercises.value.length) return;
 
-const newExercise = ref("");
-const exercises = ref<Exercise[]>([
-  {
-    id: "1",
-    name: "Bench Press",
-    sets: [
-      { weight: 0, reps: 0 },
-      { weight: 0, reps: 0 },
-    ],
-  },
-]);
-
-function addExercise() {
-  if (newExercise.value === "") return;
-
-  const exercise = exerciseStore.exercises.find(
-    (exercise) => exercise.id === newExercise.value
-  )!;
-
-  exercises.value.push({
-    id: exercise.id,
-    name: exercise.name,
-    sets: [{ weight: 0, reps: 0 }],
-  });
-
-  newExercise.value = "";
-}
-
-function addSet(exercise: Exercise) {
-  exercise.sets.push({ weight: 0, reps: 0 });
+  activeSessionStore.addExercises(newExercises.value);
+  newExercises.value = [];
 }
 </script>
 
 <template>
   <div>
-    <div>Push Day</div>
-    <div>{{ new Date().toDateString() }}</div>
+    <div class="font-bold">
+      {{ activeSessionStore.sessionName }}
+    </div>
+    <div class="text-sm">
+      {{ activeSessionStore.sessionDate.toDateString() }}
+    </div>
     <div>
-      <div v-for="exercise in exercises" :key="exercise.id" class="mt-8">
+      <div
+        v-for="exercise in activeSessionStore.sessionExercises"
+        :key="exercise.id"
+        class="mt-8"
+      >
         <div class="font-bold">{{ exercise.name }}</div>
         <div class="flex gap-2 mt-2">
           <div class="w-8">Set</div>
@@ -85,7 +60,10 @@ function addSet(exercise: Exercise) {
             />
           </div>
         </div>
-        <UButton class="mt-2" @click="addSet(exercise)">
+        <UButton
+          class="mt-2"
+          @click="activeSessionStore.addSetToExercise(exercise)"
+        >
           <UIcon name="uil:plus" />
           Add set
         </UButton>
@@ -93,13 +71,14 @@ function addSet(exercise: Exercise) {
     </div>
     <div class="mt-8">
       <USelect
-        v-model="newExercise"
+        v-model="newExercises"
         :items="exerciseStore.exercises"
         label-key="name"
         value-key="id"
         class="w-full"
+        multiple
       />
-      <UButton class="mt-2" @click="addExercise">Add exercise</UButton>
+      <UButton class="mt-2" @click="addExercises">Add exercises</UButton>
     </div>
   </div>
 </template>
