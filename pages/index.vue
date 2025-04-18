@@ -3,7 +3,8 @@ import type { DropdownMenuItem } from "@nuxt/ui";
 
 const routineStore = useRoutineStore();
 const exerciseStore = useExerciseStore();
-const activeSessionStore = useActiveSessionStore();
+const workoutStore = useWorkoutStore();
+const historyStore = useHistoryStore();
 const router = useRouter();
 
 const routineName = ref("");
@@ -44,8 +45,8 @@ function onNewRoutine() {
 }
 
 function startNewSession(name: string, exercises: string[]) {
-  activeSessionStore.startNewSession(name, exercises);
-  router.push("/active-session");
+  workoutStore.startNewSession(name, exercises);
+  router.push("/workout");
 }
 </script>
 
@@ -69,6 +70,7 @@ function startNewSession(name: string, exercises: string[]) {
               value-key="id"
               multiple
               :items="exerciseStore.exercises"
+              :search-input="{ autofocus: false }"
             />
           </UFormField>
         </form>
@@ -87,5 +89,28 @@ function startNewSession(name: string, exercises: string[]) {
     <UDropdownMenu :items="routineOptions" :content="{ align: 'start' }">
       <UButton>Track new workout</UButton>
     </UDropdownMenu>
+    <div class="mt-8">
+      <div
+        v-for="history in historyStore.histories"
+        :key="history.id"
+        class="border border-gray-300 rounded p-2 mt-4"
+      >
+        <div class="font-bold">{{ history.workout.name }}</div>
+        <div>{{ history.workout.date.toDateString() }}</div>
+        <div
+          v-for="exercise in history.workout.exercises"
+          :key="exercise.id"
+          class="mt-4"
+        >
+          <div class="font-bold">{{ exercise.name }}</div>
+          <div>
+            <div v-for="(set, i) in exercise.sets" :key="i" class="flex gap-2">
+              <div class="w-4">{{ i + 1 }}.</div>
+              <div>{{ set.weight }} x {{ set.reps }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>

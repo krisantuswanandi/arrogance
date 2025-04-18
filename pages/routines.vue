@@ -53,6 +53,7 @@ function selectRoutine(routineId: string, existingExercises: string[]) {
               value-key="id"
               multiple
               :items="exerciseStore.exercises"
+              :search-input="{ autofocus: false }"
             />
           </UFormField>
         </form>
@@ -83,6 +84,7 @@ function selectRoutine(routineId: string, existingExercises: string[]) {
               value-key="id"
               multiple
               :items="exerciseStore.exercises"
+              :search-input="{ autofocus: false }"
             />
           </UFormField>
         </form>

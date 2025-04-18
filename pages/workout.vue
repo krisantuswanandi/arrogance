@@ -1,28 +1,40 @@
 <script setup lang="ts">
-const activeSessionStore = useActiveSessionStore();
+const workoutStore = useWorkoutStore();
 const exerciseStore = useExerciseStore();
+const router = useRouter();
 
 const newExercises = ref<string[]>([]);
+
+onMounted(() => {
+  if (!workoutStore.workout) router.push("/");
+});
+
+const workout = computed(() => workoutStore.workout);
 
 function addExercises() {
   if (!newExercises.value.length) return;
 
-  activeSessionStore.addExercises(newExercises.value);
+  workoutStore.addExercises(newExercises.value);
   newExercises.value = [];
+}
+
+function finishWorkout() {
+  workoutStore.finishWorkout();
+  router.push("/");
 }
 </script>
 
 <template>
-  <div>
+  <div v-if="workout">
     <div class="font-bold">
-      {{ activeSessionStore.sessionName }}
+      {{ workout.name }}
     </div>
     <div class="text-sm">
-      {{ activeSessionStore.sessionDate.toDateString() }}
+      {{ workout.date.toDateString() }}
     </div>
     <div>
       <div
-        v-for="exercise in activeSessionStore.sessionExercises"
+        v-for="exercise in workout.exercises"
         :key="exercise.id"
         class="mt-8"
       >
@@ -60,10 +72,7 @@ function addExercises() {
             />
           </div>
         </div>
-        <UButton
-          class="mt-2"
-          @click="activeSessionStore.addSetToExercise(exercise)"
-        >
+        <UButton class="mt-2" @click="workoutStore.addSetToExercise(exercise)">
           <UIcon name="uil:plus" />
           Add set
         </UButton>
@@ -79,6 +88,9 @@ function addExercises() {
         multiple
       />
       <UButton class="mt-2" @click="addExercises">Add exercises</UButton>
+    </div>
+    <div class="mt-8 text-center">
+      <UButton class="mt-2" @click="finishWorkout">Finish Workout</UButton>
     </div>
   </div>
 </template>
