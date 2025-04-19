@@ -2,13 +2,29 @@
 import type { NavigationMenuItem } from "@nuxt/ui";
 
 const navigationItems = ref<NavigationMenuItem[]>([
-  { label: "Tracker", to: "/" },
-  { label: "Routine", to: "/routines" },
-  { label: "Exercise", to: "/exercises" },
-  { label: "Profile", to: "/profiles" },
+  { label: "Home", to: "/", icon: "lucide:house" },
+  { label: "Routine", to: "/routines", icon: "lucide:clipboard-list" },
+  { label: "Exercise", to: "/exercises", icon: "lucide:dumbbell" },
+  { label: "Profile", to: "/profiles", icon: "lucide:user-round" },
 ]);
 </script>
 
 <template>
-  <UNavigationMenu :items="navigationItems" class="px-4" />
+  <div
+    class="fixed bottom-0 left-0 w-full bg-(--ui-bg) z-50 border-t border-(--ui-border-muted)"
+  >
+    <UNavigationMenu
+      :items="navigationItems"
+      highlight
+      class="px-4 block w-full max-w-xl m-auto"
+      :ui="{ item: 'flex-1 p-0', link: 'flex flex-col items-center gap-0' }"
+    >
+      <template #item="{ item }">
+        <span class="p-1 flex">
+          <UIcon :name="item.icon!" size="20" />
+        </span>
+        <span class="text-xs">{{ item.label }}</span>
+      </template>
+    </UNavigationMenu>
+  </div>
 </template>

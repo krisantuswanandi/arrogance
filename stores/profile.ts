@@ -27,6 +27,13 @@ export const useProfileStore = defineStore("profile", () => {
     }
   }
 
+  function edit(id: string, name: string) {
+    const index = profiles.value.findIndex((profile) => profile.id === id);
+    if (index !== -1) {
+      profiles.value[index].name = name;
+    }
+  }
+
   function remove(id: string) {
     if (activeProfileId.value === id) return;
 
@@ -43,6 +50,7 @@ export const useProfileStore = defineStore("profile", () => {
   return {
     profiles,
     add,
+    edit,
     remove,
     active,
     setActive,

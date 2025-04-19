@@ -2,6 +2,7 @@
 import type { DropdownMenuItem } from "@nuxt/ui";
 
 const profileStore = useProfileStore();
+const colorMode = useColorMode();
 
 const profileName = ref("");
 const modalProfileOpen = ref(false);
@@ -40,13 +41,38 @@ function addProfile() {
 </script>
 
 <template>
-  <header class="p-4 flex items-center justify-between">
-    <div>[LOGO HERE]</div>
-    <UDropdownMenu :items="profileOptions" :content="{ align: 'start' }">
-      <UButton variant="outline" color="neutral">
-        {{ profileStore.active.name }}
-      </UButton>
-    </UDropdownMenu>
+  <header
+    class="fixed top-0 left-0 w-full bg-(--ui-bg) z-50 border-b border-(--ui-border-muted)"
+  >
+    <div
+      class="px-4 py-2 w-full max-w-xl m-auto flex items-center justify-between"
+    >
+      <div class="flex items-center gap-2">
+        <UIcon name="game-icons:muscle-up" size="24" />
+        <span class="font-semibold">Workout Log</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <UButton
+          class="capitalize"
+          variant="outline"
+          color="neutral"
+          @click="
+            colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+          "
+        >
+          {{ colorMode.value }}
+        </UButton>
+        <UDropdownMenu :items="profileOptions" :content="{ align: 'end' }">
+          <UButton
+            variant="outline"
+            color="neutral"
+            trailing-icon="lucide:chevron-down"
+          >
+            {{ profileStore.active.name }}
+          </UButton>
+        </UDropdownMenu>
+      </div>
+    </div>
     <UModal
       v-model:open="modalProfileOpen"
       title="New profile"
@@ -55,7 +81,7 @@ function addProfile() {
       <template #body>
         <form id="form" @submit.prevent="addProfile">
           <UFormField label="Profile name">
-            <UInput v-model="profileName" class="w-full" />
+            <UInput v-model="profileName" autofocus class="w-full" />
           </UFormField>
         </form>
       </template>

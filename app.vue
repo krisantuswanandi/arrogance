@@ -5,10 +5,10 @@ import { Analytics } from "@vercel/analytics/nuxt";
 <template>
   <UApp>
     <Analytics />
-    <div class="bg-gray-50 w-full max-w-xl m-auto min-h-dvh">
+    <div class="w-full max-w-xl m-auto min-h-dvh">
       <AppHeader />
       <AppNav />
-      <div class="p-4">
+      <div class="px-4 pt-16 pb-18">
         <NuxtPage />
       </div>
     </div>
