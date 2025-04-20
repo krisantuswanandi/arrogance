@@ -14,7 +14,7 @@ const modalRoutineOpen = ref(false);
 const defaultRoutineOptions: DropdownMenuItem[] = [
   {
     label: "New routine",
-    icon: "uil:plus",
+    icon: "lucide:plus",
     onSelect() {
       modalRoutineOpen.value = true;
     },
@@ -60,7 +60,7 @@ function startNewSession(name: string, exercises: string[]) {
       <template #body>
         <form id="form" @submit.prevent="onNewRoutine">
           <UFormField label="Routine name">
-            <UInput v-model="routineName" class="w-full" />
+            <UInput v-model="routineName" autofocus class="w-full" />
           </UFormField>
           <UFormField label="Exercises" class="mt-4">
             <USelectMenu

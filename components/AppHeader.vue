@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
+import AppContainer from "./AppContainer.vue";
 
 const profileStore = useProfileStore();
 const colorMode = useColorMode();
@@ -10,7 +11,7 @@ const modalProfileOpen = ref(false);
 const defaultProfileOptions: DropdownMenuItem[] = [
   {
     label: "New profile",
-    icon: "uil:plus",
+    icon: "lucide:plus",
     onSelect() {
       modalProfileOpen.value = true;
     },
@@ -44,9 +45,7 @@ function addProfile() {
   <header
     class="fixed top-0 left-0 w-full bg-(--ui-bg) z-50 border-b border-(--ui-border-muted)"
   >
-    <div
-      class="px-4 py-2 w-full max-w-xl m-auto flex items-center justify-between"
-    >
+    <AppContainer class="px-4 py-2 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <UIcon name="game-icons:muscle-up" size="24" />
         <span class="font-semibold">Workout Log</span>
@@ -72,7 +71,7 @@ function addProfile() {
           </UButton>
         </UDropdownMenu>
       </div>
-    </div>
+    </AppContainer>
     <UModal
       v-model:open="modalProfileOpen"
       title="New profile"

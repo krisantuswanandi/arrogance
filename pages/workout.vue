@@ -73,7 +73,7 @@ function finishWorkout() {
           </div>
         </div>
         <UButton class="mt-2" @click="workoutStore.addSetToExercise(exercise)">
-          <UIcon name="uil:plus" />
+          <UIcon name="lucide:plus" />
           Add set
         </UButton>
       </div>

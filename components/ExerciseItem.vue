@@ -3,12 +3,10 @@ import type { DropdownMenuItem } from "@nuxt/ui";
 
 const props = defineProps<{
   name: string;
-  showActive: boolean;
-  isActive: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: "switch" | "delete"): void;
+  (e: "delete"): void;
   (e: "edit", name: string): void;
 }>();
 
@@ -16,42 +14,28 @@ const editModalOpen = ref(false);
 const deleteModalOpen = ref(false);
 const newName = ref("");
 
-const options = computed(() => {
-  const options: DropdownMenuItem[][] = [
-    [
-      {
-        label: "Edit",
-        onSelect() {
-          newName.value = props.name;
-          editModalOpen.value = true;
-        },
-      },
-    ],
-  ];
-
-  if (!props.isActive) {
-    options[0].unshift({
-      label: "Set active",
+const options: DropdownMenuItem[][] = [
+  [
+    {
+      label: "Edit",
       onSelect() {
-        emit("switch");
+        newName.value = props.name;
+        editModalOpen.value = true;
       },
-    });
-
-    options.push([
-      {
-        label: "Delete",
-        color: "error",
-        onSelect() {
-          deleteModalOpen.value = true;
-        },
+    },
+  ],
+  [
+    {
+      label: "Delete",
+      color: "error",
+      onSelect() {
+        deleteModalOpen.value = true;
       },
-    ]);
-  }
+    },
+  ],
+];
 
-  return options;
-});
-
-function editProfile() {
+function editExercise() {
   if (!newName.value) return;
 
   emit("edit", newName.value);
@@ -61,17 +45,10 @@ function editProfile() {
 </script>
 
 <template>
-  <div class="flex items-center justify-between mt-4">
-    <div class="flex items-center gap-2">
-      <UAvatar :alt="name" size="md" />
-      <span>{{ name }}</span>
-      <UIcon
-        v-if="showActive && isActive"
-        class="text-green-600 text-sm"
-        name="lucide:circle-check"
-        size="16"
-      />
-    </div>
+  <div
+    class="flex items-center justify-between py-1 border-b border-(--ui-border-muted)"
+  >
+    <span>{{ name }}</span>
     <UDropdownMenu :items="options" :content="{ align: 'end' }">
       <UButton
         icon="lucide:ellipsis-vertical"
@@ -83,12 +60,12 @@ function editProfile() {
   </div>
   <UModal
     v-model:open="editModalOpen"
-    title="Edit profile"
+    title="Edit exercise"
     :ui="{ footer: 'justify-end' }"
   >
     <template #body>
-      <form id="form" @submit.prevent="editProfile">
-        <UFormField label="Profile name">
+      <form id="form" @submit.prevent="editExercise">
+        <UFormField label="Exercise name">
           <UInput v-model="newName" autofocus class="w-full" />
         </UFormField>
       </form>
@@ -102,13 +79,14 @@ function editProfile() {
   </UModal>
   <UModal
     v-model:open="deleteModalOpen"
-    title="Delete profile"
+    title="Delete exercise"
     :ui="{ footer: 'justify-end' }"
   >
     <template #body>
       <p class="text-sm text-(--ui-text-muted)">
-        Deleting a profile will remove all workout history and data associated
-        with it. Are you sure you want to delete this profile?
+        Deleting this exercise will remove all data associated with it, such as
+        previous log and best records. Are you sure you want to delete this
+        exercise?
       </p>
     </template>
     <template #footer>

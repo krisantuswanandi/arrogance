@@ -11,6 +11,13 @@ export const useExerciseStore = defineStore("exercise", () => {
     exercises.value.push({ id, name });
   }
 
+  function edit(id: string, name: string) {
+    const index = exercises.value.findIndex((exercise) => exercise.id === id);
+    if (index !== -1) {
+      exercises.value[index].name = name;
+    }
+  }
+
   function remove(id: string) {
     const index = exercises.value.findIndex((exercise) => exercise.id === id);
     if (index !== -1) {
@@ -21,6 +28,7 @@ export const useExerciseStore = defineStore("exercise", () => {
   return {
     exercises,
     add,
+    edit,
     remove,
   };
 });

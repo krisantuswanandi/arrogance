@@ -43,7 +43,7 @@ function selectRoutine(routineId: string, existingExercises: string[]) {
       <template #body>
         <form id="form" @submit.prevent="addRoutine">
           <UFormField label="Routine name">
-            <UInput v-model="name" class="w-full" />
+            <UInput v-model="name" autofocus class="w-full" />
           </UFormField>
           <UFormField label="Exercises" class="mt-4">
             <USelectMenu
