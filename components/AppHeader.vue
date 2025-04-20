@@ -45,10 +45,10 @@ function addProfile() {
   <header
     class="fixed top-0 left-0 w-full bg-(--ui-bg) z-50 border-b border-(--ui-border-muted)"
   >
-    <AppContainer class="px-4 py-2 flex items-center justify-between">
+    <AppContainer class="px-4 py-1.5 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <UIcon name="game-icons:muscle-up" size="24" />
-        <span class="font-semibold">Workout Log</span>
+        <NuxtImg src="/logo.svg" alt="Logo" class="h-6" />
+        <span class="text-sm font-semibold">Workout Log</span>
       </div>
       <div class="flex items-center gap-2">
         <UButton
