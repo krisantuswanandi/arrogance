@@ -27,11 +27,11 @@ function addProfile() {
         />
       </li>
     </ul>
-    <FloatingButton
-      icon="lucide:plus"
-      label="New profile"
-      @click="modalOpen = true"
-    />
+    <FloatingButton>
+      <UButton icon="lucide:plus" class="shadow-lg" @click="modalOpen = true">
+        New profile
+      </UButton>
+    </FloatingButton>
     <UModal
       v-model:open="modalOpen"
       title="New profile"

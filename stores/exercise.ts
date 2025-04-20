@@ -6,6 +6,10 @@ export interface Exercise {
 export const useExerciseStore = defineStore("exercise", () => {
   const exercises = ref<Exercise[]>(defaultExercises);
 
+  const sortedExercises = computed(() => {
+    return exercises.value.toSorted((a, b) => a.name.localeCompare(b.name));
+  });
+
   function add(name: string) {
     const id = crypto.randomUUID();
     exercises.value.push({ id, name });
@@ -26,7 +30,7 @@ export const useExerciseStore = defineStore("exercise", () => {
   }
 
   return {
-    exercises,
+    exercises: sortedExercises,
     add,
     edit,
     remove,

@@ -34,12 +34,57 @@ function selectRoutine(routineId: string, existingExercises: string[]) {
 
 <template>
   <div>
+    <h1 class="text-sm font-semibold">Routines</h1>
+    <ul class="mt-4">
+      <li
+        v-for="routine in routineStore.routines"
+        :key="routine.id"
+        class="mt-4"
+      >
+        <div class="p-2 border border-(--ui-border-muted) rounded">
+          <div class="flex justify-between">
+            <span class="font-bold">{{ routine.name }}</span>
+            <UButton
+              variant="link"
+              color="error"
+              @click="routineStore.remove(routine.id)"
+            >
+              Delete
+            </UButton>
+          </div>
+          <ol v-if="routine.exercises.length" class="my-2">
+            <li v-for="exercise in routine.exercises" :key="exercise.id">
+              <span>{{ exercise.name }}</span>
+            </li>
+          </ol>
+          <UButton
+            class="mt-2"
+            @click="
+              selectRoutine(
+                routine.id,
+                routine.exercises.map((e) => e.id)
+              )
+            "
+          >
+            Update exercises
+          </UButton>
+        </div>
+      </li>
+    </ul>
+    <FloatingButton>
+      <UButton
+        icon="lucide:plus"
+        class="shadow-lg"
+        @click="modalRoutineOpen = true"
+      >
+        New routine
+      </UButton>
+    </FloatingButton>
     <UModal
       v-model:open="modalRoutineOpen"
       title="New routine"
       :ui="{ footer: 'justify-end' }"
     >
-      <UButton>Add new routine</UButton>
       <template #body>
         <form id="form" @submit.prevent="addRoutine">
           <UFormField label="Routine name">
@@ -100,41 +145,5 @@ function selectRoutine(routineId: string, existingExercises: string[]) {
         <UButton type="submit" form="form">Save</UButton>
       </template>
     </UModal>
-    <ul class="mt-8">
-      <li
-        v-for="routine in routineStore.routines"
-        :key="routine.id"
-        class="mt-8"
-      >
-        <div class="p-2 border border-gray-300 rounded">
-          <div class="flex justify-between">
-            <span class="font-bold">{{ routine.name }}</span>
-            <UButton
-              variant="link"
-              color="error"
-              @click="routineStore.remove(routine.id)"
-            >
-              Delete
-            </UButton>
-          </div>
-          <ol v-if="routine.exercises.length" class="my-2">
-            <li v-for="exercise in routine.exercises" :key="exercise.id">
-              <span>{{ exercise.name }}</span>
-            </li>
-          </ol>
-          <UButton
-            class="mt-2"
-            @click="
-              selectRoutine(
-                routine.id,
-                routine.exercises.map((e) => e.id)
-              )
-            "
-          >
-            Update exercises
-          </UButton>
-        </div>
-      </li>
-    </ul>
   </div>
 </template>

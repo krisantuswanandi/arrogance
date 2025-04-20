@@ -10,19 +10,13 @@ function addExercise() {
   name.value = "";
   modalOpen.value = false;
 }
-
-const sortedExercises = computed(() => {
-  return exerciseStore.exercises.toSorted((a, b) =>
-    a.name.localeCompare(b.name)
-  );
-});
 </script>
 
 <template>
   <div>
     <h1 class="text-sm font-semibold">Exercises</h1>
     <ul class="mt-4">
-      <li v-for="i in sortedExercises" :key="i.id">
+      <li v-for="i in exerciseStore.exercises" :key="i.id">
         <ExerciseItem
           :name="i.name"
           @edit="exerciseStore.edit(i.id, $event)"
@@ -30,11 +24,11 @@ const sortedExercises = computed(() => {
         />
       </li>
     </ul>
-    <FloatingButton
-      icon="lucide:plus"
-      label="New exercise"
-      @click="modalOpen = true"
-    />
+    <FloatingButton>
+      <UButton icon="lucide:plus" class="shadow-lg" @click="modalOpen = true">
+        New exercise
+      </UButton>
+    </FloatingButton>
     <UModal
       v-model:open="modalOpen"
       title="New exercise"

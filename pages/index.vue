@@ -52,6 +52,38 @@ function startNewSession(name: string, exercises: string[]) {
 
 <template>
   <div>
+    <h1 class="text-sm font-semibold">Histories</h1>
+    <ol class="mt-4">
+      <li
+        v-for="history in historyStore.histories"
+        :key="history.id"
+        class="border border-(--ui-border-muted) rounded p-2 mt-4"
+      >
+        <div class="font-bold">{{ history.workout.name }}</div>
+        <div>{{ history.workout.date.toDateString() }}</div>
+        <div
+          v-for="exercise in history.workout.exercises"
+          :key="exercise.id"
+          class="mt-4"
+        >
+          <div class="font-bold">{{ exercise.name }}</div>
+          <div>
+            <div v-for="(set, i) in exercise.sets" :key="i" class="flex gap-2">
+              <div class="w-4">{{ i + 1 }}.</div>
+              <div>{{ set.weight }} x {{ set.reps }}</div>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ol>
+    <FloatingButton>
+      <UDropdownMenu
+        :items="routineOptions"
+        :content="{ align: 'end', side: 'top' }"
+      >
+        <UButton icon="lucide:plus">New workout</UButton>
+      </UDropdownMenu>
+    </FloatingButton>
     <UModal
       v-model:open="modalRoutineOpen"
       title="New routine"
@@ -86,31 +118,5 @@ function startNewSession(name: string, exercises: string[]) {
         <UButton type="submit" form="form">Save</UButton>
       </template>
     </UModal>
-    <UDropdownMenu :items="routineOptions" :content="{ align: 'start' }">
-      <UButton>Track new workout</UButton>
-    </UDropdownMenu>
-    <div class="mt-8">
-      <div
-        v-for="history in historyStore.histories"
-        :key="history.id"
-        class="border border-gray-300 rounded p-2 mt-4"
-      >
-        <div class="font-bold">{{ history.workout.name }}</div>
-        <div>{{ history.workout.date.toDateString() }}</div>
-        <div
-          v-for="exercise in history.workout.exercises"
-          :key="exercise.id"
-          class="mt-4"
-        >
-          <div class="font-bold">{{ exercise.name }}</div>
-          <div>
-            <div v-for="(set, i) in exercise.sets" :key="i" class="flex gap-2">
-              <div class="w-4">{{ i + 1 }}.</div>
-              <div>{{ set.weight }} x {{ set.reps }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
