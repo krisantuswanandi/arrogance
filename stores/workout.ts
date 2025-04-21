@@ -18,15 +18,21 @@ export interface Workout {
 export const useWorkoutStore = defineStore("workout", () => {
   const exerciseStore = useExerciseStore();
   const historyStore = useHistoryStore();
+  const profileStore = useProfileStore();
 
-  const workout = ref<Workout | undefined>();
+  const workoutByUser = ref<Record<string, Workout | undefined>>({});
+
+  const workout = computed(() => {
+    return workoutByUser.value[profileStore.active.id];
+  });
 
   function startNewSession(name: string, exerciseIds: string[]) {
-    workout.value = {
+    workoutByUser.value[profileStore.active.id] = {
       name,
       date: new Date(),
       exercises: [],
     };
+
     addExercises(exerciseIds);
   }
 
@@ -60,9 +66,11 @@ export const useWorkoutStore = defineStore("workout", () => {
 
   function finishWorkout() {
     if (!workout.value) return;
+
     const data = workout.value;
     historyStore.add(data);
-    workout.value = undefined;
+
+    workoutByUser.value[profileStore.active.id] = undefined;
   }
 
   return {
