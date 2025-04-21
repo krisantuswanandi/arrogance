@@ -11,6 +11,10 @@ onMounted(() => {
 
 const workout = computed(() => workoutStore.workout);
 
+watch(workout, (val) => {
+  if (!val) router.push("/");
+});
+
 function addExercises() {
   if (!newExercises.value.length) return;
 

@@ -77,7 +77,11 @@ function startNewSession(name: string, exercises: string[]) {
       </li>
     </ol>
     <FloatingButton>
+      <UButton v-if="workoutStore.workout" icon="lucide:play" to="/workout">
+        Continue workout
+      </UButton>
       <UDropdownMenu
+        v-else
         :items="routineOptions"
         :content="{ align: 'end', side: 'top' }"
       >
