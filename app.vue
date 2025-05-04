@@ -2,6 +2,7 @@
 import { Analytics } from "@vercel/analytics/nuxt";
 
 const { isActive: isSplashActive } = useSplash();
+const accountStore = useAccountStore();
 
 initFirebase();
 </script>
@@ -10,7 +11,7 @@ initFirebase();
   <UApp>
     <Analytics />
     <AppSplash v-if="isSplashActive" />
-    <AppContainer class="min-h-dvh">
+    <AppContainer v-if="!!accountStore.account" class="min-h-dvh">
       <AppHeader />
       <AppNav />
       <div class="px-4 pt-16 pb-18">

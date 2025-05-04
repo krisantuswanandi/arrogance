@@ -1,4 +1,11 @@
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 
 interface Profile {
   id: string;
@@ -77,8 +84,10 @@ export const useProfileStore = defineStore("profile", () => {
 
 async function fetchProfiles() {
   const db = getFirestore();
+  const auth = getAuth();
   const docRef = collection(db, "profiles");
-  const snap = await getDocs(docRef);
+  const filter = where("uid", "==", auth.currentUser?.uid);
+  const snap = await getDocs(query(docRef, filter));
   return snap.docs.map((doc) => {
     const data = doc.data();
 
