@@ -5,17 +5,42 @@ import {
   getDocs,
   query,
   where,
+  addDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 
 interface Profile {
   id: string;
   name: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const useProfileStore = defineStore("profile", () => {
+  const queryCache = useQueryCache();
+
   const { data: profiles } = useQuery<Profile[]>({
     key: ["profiles"],
     query: () => fetchProfiles(),
+  });
+
+  const { mutate: addProfileTemp } = useMutation({
+    mutation: (name: string) => addProfile(name),
+    onSettled: () => queryCache.invalidateQueries({ key: ["profiles"] }),
+  });
+
+  const { mutate: editProfileTemp } = useMutation({
+    mutation: (param: { id: string; name: string }) =>
+      editProfile(param.id, param.name),
+    onSettled: () => queryCache.invalidateQueries({ key: ["profiles"] }),
+  });
+
+  const { mutate: deleteProfileTemp } = useMutation({
+    mutation: (id: string) => deleteProfile(id),
+    onSettled: () => queryCache.invalidateQueries({ key: ["profiles"] }),
   });
 
   const activeProfileId = useLocalStorage("active-profile", "");
@@ -35,37 +60,19 @@ export const useProfileStore = defineStore("profile", () => {
   });
 
   function add(name: string, setActive?: boolean) {
-    if (!profiles.value) return;
-
-    const id = crypto.randomUUID();
-    profiles.value.push({ id, name });
-
-    if (!activeProfileId.value) {
-      activeProfileId.value = id;
-    }
+    addProfileTemp(name);
 
     if (setActive) {
-      activeProfileId.value = id;
+      // activeProfileId.value = id;
     }
   }
 
   function edit(id: string, name: string) {
-    if (!profiles.value) return;
-
-    const index = profiles.value.findIndex((profile) => profile.id === id);
-    if (index !== -1) {
-      profiles.value[index].name = name;
-    }
+    editProfileTemp({ id, name });
   }
 
   function remove(id: string) {
-    if (!profiles.value) return;
-    if (activeProfileId.value === id) return;
-
-    const index = profiles.value.findIndex((profile) => profile.id === id);
-    if (index !== -1) {
-      profiles.value.splice(index, 1);
-    }
+    deleteProfileTemp(id);
   }
 
   function setActive(id: string) {
@@ -88,12 +95,40 @@ async function fetchProfiles() {
   const docRef = collection(db, "profiles");
   const filter = where("uid", "==", auth.currentUser?.uid);
   const snap = await getDocs(query(docRef, filter));
-  return snap.docs.map((doc) => {
-    const data = doc.data();
+  return snap.docs
+    .map((doc) => {
+      const data = doc.data();
 
-    return {
-      id: doc.id,
-      name: data.name,
-    };
+      return {
+        id: doc.id,
+        name: data.name,
+        createdAt: new Date(data.createdAt.seconds),
+        updatedAt: new Date(data.updatedAt.seconds),
+      } satisfies Profile;
+    })
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+}
+
+async function addProfile(name: string) {
+  const db = getFirestore();
+  const auth = getAuth();
+  const docRef = collection(db, "profiles");
+  await addDoc(docRef, {
+    name,
+    uid: auth.currentUser?.uid,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
   });
+}
+
+async function editProfile(id: string, name: string) {
+  const db = getFirestore();
+  const docRef = doc(db, "profiles", id);
+  await updateDoc(docRef, { name, updatedAt: serverTimestamp() });
+}
+
+async function deleteProfile(id: string) {
+  const db = getFirestore();
+  const docRef = doc(db, "profiles", id);
+  await deleteDoc(docRef);
 }
