@@ -9,10 +9,14 @@ export const useHistoryStore = defineStore("history", () => {
   const historiesByUser = ref<Record<string, History[] | undefined>>({});
 
   const histories = computed(() => {
+    if (!profileStore.active) return [];
+
     return historiesByUser.value[profileStore.active.id];
   });
 
   function add(workout: Workout) {
+    if (!profileStore.active) return [];
+
     const id = crypto.randomUUID();
 
     if (!histories.value) {

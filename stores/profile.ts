@@ -1,20 +1,35 @@
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+
 interface Profile {
   id: string;
   name: string;
 }
 
 export const useProfileStore = defineStore("profile", () => {
-  const profiles = ref<Profile[]>([{ id: "1", name: "Default" }]);
+  const { data: profiles } = useQuery<Profile[]>({
+    key: ["profiles"],
+    query: () => fetchProfiles(),
+  });
 
-  const activeProfileId = ref("1");
+  const activeProfileId = useLocalStorage("active-profile", "");
+  watch(profiles, (val) => {
+    if (activeProfileId.value) return;
+    if (!val) return;
+    if (!val.length) return;
+    activeProfileId.value = val[0].id;
+  });
 
   const active = computed(() => {
+    if (!profiles.value) return null;
+
     return profiles.value.find(
-      (profile) => profile.id === activeProfileId.value
+      (profile) => profile.id === activeProfileId.value,
     )!;
   });
 
   function add(name: string, setActive?: boolean) {
+    if (!profiles.value) return;
+
     const id = crypto.randomUUID();
     profiles.value.push({ id, name });
 
@@ -28,6 +43,8 @@ export const useProfileStore = defineStore("profile", () => {
   }
 
   function edit(id: string, name: string) {
+    if (!profiles.value) return;
+
     const index = profiles.value.findIndex((profile) => profile.id === id);
     if (index !== -1) {
       profiles.value[index].name = name;
@@ -35,6 +52,7 @@ export const useProfileStore = defineStore("profile", () => {
   }
 
   function remove(id: string) {
+    if (!profiles.value) return;
     if (activeProfileId.value === id) return;
 
     const index = profiles.value.findIndex((profile) => profile.id === id);
@@ -56,3 +74,17 @@ export const useProfileStore = defineStore("profile", () => {
     setActive,
   };
 });
+
+async function fetchProfiles() {
+  const db = getFirestore();
+  const docRef = collection(db, "profiles");
+  const snap = await getDocs(docRef);
+  return snap.docs.map((doc) => {
+    const data = doc.data();
+
+    return {
+      id: doc.id,
+      name: data.name,
+    };
+  });
+}

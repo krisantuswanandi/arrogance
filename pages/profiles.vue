@@ -10,6 +10,9 @@ function addProfile() {
   name.value = "";
   modalOpen.value = false;
 }
+
+const profiles = computed(() => profileStore.profiles);
+const activeProfile = computed(() => profileStore.active);
 </script>
 
 <template>
@@ -19,8 +22,8 @@ function addProfile() {
       <li v-for="i in profileStore.profiles" :key="i.id">
         <ProfileItem
           :name="i.name"
-          :show-active="profileStore.profiles.length > 1"
-          :is-active="i.id === profileStore.active.id"
+          :show-active="profiles ? profiles.length > 1 : false"
+          :is-active="i.id === activeProfile?.id"
           @switch="profileStore.setActive(i.id)"
           @edit="profileStore.edit(i.id, $event)"
           @delete="profileStore.remove(i.id)"

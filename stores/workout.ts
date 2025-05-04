@@ -23,10 +23,14 @@ export const useWorkoutStore = defineStore("workout", () => {
   const workoutByUser = ref<Record<string, Workout | undefined>>({});
 
   const workout = computed(() => {
+    if (!profileStore.active) return;
+
     return workoutByUser.value[profileStore.active.id];
   });
 
   function startNewSession(name: string, exerciseIds: string[]) {
+    if (!profileStore.active) return;
+
     workoutByUser.value[profileStore.active.id] = {
       name,
       date: new Date(),
@@ -50,7 +54,7 @@ export const useWorkoutStore = defineStore("workout", () => {
 
   function createNewExercise(id: string): Exercise {
     const exercise = exerciseStore.exercises.find(
-      (exercise) => exercise.id === id
+      (exercise) => exercise.id === id,
     )!;
 
     return {

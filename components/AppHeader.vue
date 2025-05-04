@@ -19,6 +19,7 @@ const defaultProfileOptions: DropdownMenuItem[] = [
 ];
 
 const profileOptions = computed<DropdownMenuItem[][]>(() => {
+  if (!profileStore.profiles) return [defaultProfileOptions];
   if (!profileStore.profiles.length) return [defaultProfileOptions];
 
   return [
@@ -67,7 +68,7 @@ function addProfile() {
             color="neutral"
             trailing-icon="lucide:chevron-down"
           >
-            {{ profileStore.active.name }}
+            {{ profileStore.active?.name || "" }}
           </UButton>
         </UDropdownMenu>
       </div>

@@ -23,6 +23,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@vueuse/nuxt",
     "@nuxt/image",
+    "@pinia/colada-nuxt",
   ],
 
   css: ["~/assets/css/main.css"],
@@ -36,3 +37,4 @@ export default defineNuxtConfig({
 
   ssr: false,
 });
+
