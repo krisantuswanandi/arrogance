@@ -1,44 +1,108 @@
+import { getAuth } from "firebase/auth";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where,
+  addDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+
 export interface Exercise {
   id: string;
   name: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const useExerciseStore = defineStore("exercise", () => {
-  const exercises = ref<Exercise[]>(defaultExercises);
+  const queryCache = useQueryCache();
 
-  const sortedExercises = computed(() => {
-    return exercises.value.toSorted((a, b) => a.name.localeCompare(b.name));
+  const { data: exercises } = useQuery<Exercise[]>({
+    key: ["exercises"],
+    query: () => fetchExercises(),
+  });
+
+  const { mutate: addExerciseTemp } = useMutation({
+    mutation: (name: string) => addExercise(name),
+    onSettled: () => queryCache.invalidateQueries({ key: ["exercises"] }),
+  });
+
+  const { mutate: editExerciseTemp } = useMutation({
+    mutation: (param: { id: string; name: string }) =>
+      editExercise(param.id, param.name),
+    onSettled: () => queryCache.invalidateQueries({ key: ["exercises"] }),
+  });
+
+  const { mutate: deleteExerciseTemp } = useMutation({
+    mutation: (id: string) => deleteExercise(id),
+    onSettled: () => queryCache.invalidateQueries({ key: ["exercises"] }),
   });
 
   function add(name: string) {
-    const id = crypto.randomUUID();
-    exercises.value.push({ id, name });
+    addExerciseTemp(name);
   }
 
   function edit(id: string, name: string) {
-    const index = exercises.value.findIndex((exercise) => exercise.id === id);
-    if (index !== -1) {
-      exercises.value[index].name = name;
-    }
+    editExerciseTemp({ id, name });
   }
 
   function remove(id: string) {
-    const index = exercises.value.findIndex((exercise) => exercise.id === id);
-    if (index !== -1) {
-      exercises.value.splice(index, 1);
-    }
+    deleteExerciseTemp(id);
   }
 
   return {
-    exercises: sortedExercises,
+    exercises,
     add,
     edit,
     remove,
   };
 });
 
-const defaultExercises: Exercise[] = [
-  { id: "1", name: "Deadlift" },
-  { id: "2", name: "Squat" },
-  { id: "3", name: "Bench Press" },
-];
+async function fetchExercises() {
+  const db = getFirestore();
+  const auth = getAuth();
+  const docRef = collection(db, "exercises");
+  const filter = where("uid", "==", auth.currentUser?.uid);
+  const snap = await getDocs(query(docRef, filter));
+  return snap.docs
+    .map((doc) => {
+      const data = doc.data();
+
+      return {
+        id: doc.id,
+        name: data.name,
+        createdAt: new Date(data.createdAt.seconds),
+        updatedAt: new Date(data.updatedAt.seconds),
+      } satisfies Exercise;
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+async function addExercise(name: string) {
+  const db = getFirestore();
+  const auth = getAuth();
+  const docRef = collection(db, "exercises");
+  await addDoc(docRef, {
+    name,
+    uid: auth.currentUser?.uid,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
+
+async function editExercise(id: string, name: string) {
+  const db = getFirestore();
+  const docRef = doc(db, "exercises", id);
+  await updateDoc(docRef, { name, updatedAt: serverTimestamp() });
+}
+
+async function deleteExercise(id: string) {
+  const db = getFirestore();
+  const docRef = doc(db, "exercises", id);
+  await deleteDoc(docRef);
+}
