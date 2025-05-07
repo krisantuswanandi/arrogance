@@ -17,18 +17,24 @@ function addRoutine() {
   modalRoutineOpen.value = false;
 }
 
-function addExercises() {
+function editRoutine() {
   if (!selectedRoutine.value) return;
-  if (!exercises.value.length) return;
+  if (!name.value || !exercises.value.length) return;
 
-  routineStore.updateExercises(selectedRoutine.value, exercises.value);
+  routineStore.edit(selectedRoutine.value, name.value, exercises.value);
+  name.value = "";
   exercises.value = [];
   selectedRoutine.value = "";
 }
 
-function selectRoutine(routineId: string, existingExercises: string[]) {
-  selectedRoutine.value = routineId;
+function selectRoutine(
+  routineId: string,
+  routineName: string,
+  existingExercises: string[],
+) {
+  name.value = routineName;
   exercises.value = existingExercises;
+  selectedRoutine.value = routineId;
 }
 </script>
 
@@ -62,11 +68,12 @@ function selectRoutine(routineId: string, existingExercises: string[]) {
             @click="
               selectRoutine(
                 routine.id,
-                routine.exercises.map((e) => e.id)
+                routine.name,
+                routine.exercises.map((e) => e.id),
               )
             "
           >
-            Update exercises
+            Update
           </UButton>
         </div>
       </li>
@@ -120,7 +127,10 @@ function selectRoutine(routineId: string, existingExercises: string[]) {
       :ui="{ footer: 'justify-end' }"
     >
       <template #body>
-        <form id="form" @submit.prevent="addExercises">
+        <form id="form" @submit.prevent="editRoutine">
+          <UFormField label="Routine name">
+            <UInput v-model="name" autofocus class="w-full" />
+          </UFormField>
           <UFormField label="Exercises">
             <USelectMenu
               v-model="exercises"
