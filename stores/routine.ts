@@ -12,7 +12,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
-interface Routine {
+export interface Routine {
   id: string;
   name: string;
   exerciseIds: string[];
@@ -70,7 +70,6 @@ export const useRoutineStore = defineStore("routine", () => {
 
       return {
         ...rest,
-        exerciseIds,
         exercises: exerciseIds
           .map((exerciseId) => {
             const exercise = exercises.find(
