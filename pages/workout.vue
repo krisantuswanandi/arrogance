@@ -22,6 +22,11 @@ function addExercises() {
   newExercises.value = [];
 }
 
+function cancelWorkout() {
+  workoutStore.cancelWorkout();
+  router.push("/");
+}
+
 function finishWorkout() {
   workoutStore.finishWorkout();
   router.push("/");
@@ -93,7 +98,10 @@ function finishWorkout() {
       />
       <UButton class="mt-2" @click="addExercises">Add exercises</UButton>
     </div>
-    <div class="mt-8 text-center">
+    <div class="mt-8 text-center gap-2 flex justify-center">
+      <UButton class="mt-2" variant="ghost" @click="cancelWorkout">
+        Cancel
+      </UButton>
       <UButton class="mt-2" @click="finishWorkout">Finish Workout</UButton>
     </div>
   </div>

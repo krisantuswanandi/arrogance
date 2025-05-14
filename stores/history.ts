@@ -7,6 +7,7 @@ import {
   where,
   addDoc,
   serverTimestamp,
+  and,
 } from "firebase/firestore";
 
 export interface History {
@@ -20,9 +21,11 @@ export const useHistoryStore = defineStore("history", () => {
   const queryCache = useQueryCache();
   const profileStore = useProfileStore();
 
+  const activeProfileId = computed(() => profileStore.active?.id);
+
   const { data: histories } = useQuery<History[]>({
-    key: ["histories"],
-    query: () => fetchHistories(),
+    key: () => ["histories", activeProfileId.value || ""],
+    query: () => fetchHistories(activeProfileId.value),
   });
 
   const { mutate: addHistoryTemp } = useMutation({
@@ -32,9 +35,9 @@ export const useHistoryStore = defineStore("history", () => {
   });
 
   function add(workout: Workout) {
-    if (!profileStore.active) return;
+    if (!activeProfileId.value) return;
 
-    addHistoryTemp({ profile: profileStore.active.id, workout });
+    addHistoryTemp({ profile: activeProfileId.value, workout });
   }
 
   return {
@@ -43,11 +46,15 @@ export const useHistoryStore = defineStore("history", () => {
   };
 });
 
-async function fetchHistories() {
+async function fetchHistories(profile?: string) {
+  if (!profile) return [];
+
   const db = getFirestore();
   const auth = getAuth();
   const docRef = collection(db, "histories");
-  const filter = where("uid", "==", auth.currentUser?.uid);
+  const uidFilter = where("uid", "==", auth.currentUser?.uid);
+  const profileFilter = where("profile", "==", profile);
+  const filter = and(uidFilter, profileFilter);
   const snap = await getDocs(query(docRef, filter));
   return snap.docs
     .map((doc) => {

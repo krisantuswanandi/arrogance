@@ -79,11 +79,16 @@ export const useWorkoutStore = defineStore("workout", () => {
     workoutByUser.value[profileStore.active!.id] = undefined;
   }
 
+  function cancelWorkout() {
+    workoutByUser.value[profileStore.active!.id] = undefined;
+  }
+
   return {
     workout,
     startNewSession,
     addExercises,
     addSetToExercise,
     finishWorkout,
+    cancelWorkout,
   };
 });
