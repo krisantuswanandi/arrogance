@@ -12,6 +12,7 @@ interface Exercise {
 export interface Workout {
   name: string;
   date: Date;
+  notes: string;
   exercises: Exercise[];
 }
 
@@ -34,6 +35,7 @@ export const useWorkoutStore = defineStore("workout", () => {
     workoutByUser.value[profileStore.active.id] = {
       name,
       date: new Date(),
+      notes: "",
       exercises: [],
     };
 
@@ -53,7 +55,7 @@ export const useWorkoutStore = defineStore("workout", () => {
   }
 
   function createNewExercise(id: string): Exercise {
-    const exercise = exerciseStore.exercises.find(
+    const exercise = exerciseStore.exercises!.find(
       (exercise) => exercise.id === id,
     )!;
 
@@ -74,7 +76,7 @@ export const useWorkoutStore = defineStore("workout", () => {
     const data = workout.value;
     historyStore.add(data);
 
-    workoutByUser.value[profileStore.active.id] = undefined;
+    workoutByUser.value[profileStore.active!.id] = undefined;
   }
 
   return {
