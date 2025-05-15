@@ -64,10 +64,10 @@ async function fetchHistories(profile?: string) {
         id: doc.id,
         workout: {
           ...data.workout,
-          date: new Date(data.workout.date.seconds),
+          date: data.workout.date.toDate(),
         },
-        createdAt: new Date(data.createdAt.seconds),
-        updatedAt: new Date(data.updatedAt.seconds),
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
       } satisfies History;
     })
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());

@@ -104,8 +104,8 @@ async function fetchRoutines() {
         id: doc.id,
         name: data.name,
         exerciseIds: data.exerciseIds,
-        createdAt: new Date(data.createdAt.seconds),
-        updatedAt: new Date(data.updatedAt.seconds),
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
       } satisfies Routine;
     })
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());

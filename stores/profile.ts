@@ -102,8 +102,8 @@ async function fetchProfiles() {
       return {
         id: doc.id,
         name: data.name,
-        createdAt: new Date(data.createdAt.seconds),
-        updatedAt: new Date(data.updatedAt.seconds),
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
       } satisfies Profile;
     })
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());

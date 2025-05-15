@@ -30,7 +30,7 @@ const routineOptions = computed<DropdownMenuItem[][]>(() => {
       onSelect() {
         startNewSession(
           routine.name,
-          routine.exercises.map((e) => e.id)
+          routine.exercises.map((e) => e.id),
         );
       },
     })),
