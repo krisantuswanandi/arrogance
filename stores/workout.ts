@@ -16,13 +16,19 @@ export interface Workout {
   exercises: Exercise[];
 }
 
+export type Workouts = Record<string, Workout | undefined>;
+
 export const useWorkoutStore = defineStore("workout", () => {
   const exerciseStore = useExerciseStore();
   const historyStore = useHistoryStore();
   const profileStore = useProfileStore();
   const recordStore = useRecordStore();
 
-  const workoutByUser = ref<Record<string, Workout | undefined>>({});
+  const workoutByUser = useLocalStorage<Workouts>(
+    "active-workout",
+    {},
+    { serializer: workoutSerializer() }
+  );
 
   const workout = computed(() => {
     if (!profileStore.active) return;
@@ -94,3 +100,41 @@ export const useWorkoutStore = defineStore("workout", () => {
     cancelWorkout,
   };
 });
+
+type SerializedWorkout = Omit<Workout, "date"> & { date: string };
+
+type SerializedWorkouts = Record<string, SerializedWorkout | undefined>;
+
+function workoutSerializer() {
+  return {
+    read: (v: string) => {
+      const parsed = JSON.parse(v) as SerializedWorkouts;
+      const deserialized: Workouts = {};
+
+      for (const [key, workout] of Object.entries(parsed)) {
+        if (!workout) continue;
+
+        deserialized[key] = {
+          ...workout,
+          date: new Date(workout.date),
+        };
+      }
+
+      return deserialized;
+    },
+    write: (v: Workouts) => {
+      const serialized: SerializedWorkouts = {};
+
+      for (const [key, workout] of Object.entries(v)) {
+        if (!workout) continue;
+
+        serialized[key] = {
+          ...workout,
+          date: workout.date.toISOString(),
+        };
+      }
+
+      return JSON.stringify(serialized);
+    },
+  };
+}
