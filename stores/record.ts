@@ -1,4 +1,11 @@
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  setDoc,
+  serverTimestamp,
+  doc,
+} from "firebase/firestore";
 import type { ExerciseSet } from "./workout";
 
 export interface ExerciseRecord {
@@ -8,7 +15,10 @@ export interface ExerciseRecord {
   updatedAt: Date;
 }
 
+export type ExerciseRecords = Record<string, ExerciseRecord>;
+
 export const useRecordStore = defineStore("record", () => {
+  const queryCache = useQueryCache();
   const profileStore = useProfileStore();
 
   const activeProfileId = computed(() => profileStore.active?.id);
@@ -18,13 +28,36 @@ export const useRecordStore = defineStore("record", () => {
     query: () => fetchRecords(activeProfileId.value),
   });
 
+  const { mutate: updateRecordsTemp } = useMutation({
+    mutation: (param: {
+      profile: string;
+      workout: Workout;
+      records?: ExerciseRecords;
+    }) => updateRecords(param.profile, param.workout, param.records),
+    onSettled: () =>
+      queryCache.invalidateQueries({
+        key: ["records", activeProfileId.value || ""],
+      }),
+  });
+
+  function update(workout: Workout) {
+    if (!activeProfileId.value) return;
+
+    updateRecordsTemp({
+      profile: activeProfileId.value,
+      workout,
+      records: records.value,
+    });
+  }
+
   return {
     records,
+    update,
   };
 });
 
 async function fetchRecords(profile?: string) {
-  const records: Record<string, ExerciseRecord> = {};
+  const records: ExerciseRecords = {};
 
   if (!profile) return records;
 
@@ -43,4 +76,37 @@ async function fetchRecords(profile?: string) {
   });
 
   return records;
+}
+
+async function updateRecords(
+  profile: string,
+  workout: Workout,
+  records?: ExerciseRecords
+) {
+  const db = getFirestore();
+
+  const recordsUpdate = workout.exercises.map((exercise) => {
+    const lastRecord = records ? records[exercise.id] : null;
+
+    const docRef = doc(db, "profiles", profile, "records", exercise.id);
+    setDoc(docRef, {
+      bestSet: getBestSet(exercise.sets, lastRecord?.bestSet),
+      lastSets: exercise.sets,
+      createdAt: lastRecord?.createdAt || serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  });
+
+  await Promise.all(recordsUpdate);
+}
+
+function getBestSet(currentSets: ExerciseSet[], currentBest?: ExerciseSet) {
+  const combinedSets = [...(currentBest ? [currentBest] : []), ...currentSets];
+  const sortedSets = combinedSets.sort((a, b) => {
+    if (b.weight === a.weight) {
+      return b.reps - a.reps;
+    }
+    return b.weight - a.weight;
+  });
+  return sortedSets[0];
 }

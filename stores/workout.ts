@@ -20,6 +20,7 @@ export const useWorkoutStore = defineStore("workout", () => {
   const exerciseStore = useExerciseStore();
   const historyStore = useHistoryStore();
   const profileStore = useProfileStore();
+  const recordStore = useRecordStore();
 
   const workoutByUser = ref<Record<string, Workout | undefined>>({});
 
@@ -56,7 +57,7 @@ export const useWorkoutStore = defineStore("workout", () => {
 
   function createNewExercise(id: string): Exercise {
     const exercise = exerciseStore.exercises!.find(
-      (exercise) => exercise.id === id,
+      (exercise) => exercise.id === id
     )!;
 
     return {
@@ -75,6 +76,7 @@ export const useWorkoutStore = defineStore("workout", () => {
 
     const data = workout.value;
     historyStore.add(data);
+    recordStore.update(data);
 
     workoutByUser.value[profileStore.active!.id] = undefined;
   }
