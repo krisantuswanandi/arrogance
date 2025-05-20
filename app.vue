@@ -12,11 +12,9 @@ initFirebase();
     <Analytics />
     <AppSplash v-if="isSplashActive" />
     <AppContainer v-if="!!accountStore.account" class="min-h-dvh">
-      <AppHeader />
-      <AppNav />
-      <div class="px-4 pt-16 pb-18">
+      <NuxtLayout>
         <NuxtPage />
-      </div>
+      </NuxtLayout>
     </AppContainer>
   </UApp>
 </template>
