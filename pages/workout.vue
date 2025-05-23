@@ -53,23 +53,28 @@ function finishWorkout() {
           <div class="text-sm font-bold">Current Workout</div>
         </div>
       </template>
-      <div class="font-bold">
-        {{ workout.name }}
-      </div>
-      <div class="text-sm">
-        {{ workout.date.toDateString() }}
+      <div class="border-b border-(--ui-border) pb-4">
+        <div class="font-bold">
+          {{ workout.name }}
+        </div>
+        <div class="text-sm">
+          {{ workout.date.toDateString() }}
+        </div>
       </div>
       <div>
         <div
           v-for="exercise in workout.exercises"
           :key="exercise.id"
-          class="mt-8"
+          class="border-b border-(--ui-border) py-6"
         >
-          <div class="font-bold">{{ exercise.name }}</div>
-          <div class="flex gap-2 mt-2">
+          <div class="text-sm font-bold">{{ exercise.name }}</div>
+          <div
+            class="flex gap-2 mt-2 text-xs text-(--ui-text-muted) font-semibold"
+          >
             <div class="w-8">Set</div>
             <div class="flex-1">Weight</div>
             <div class="flex-1">Reps</div>
+            <div class="w-8" />
           </div>
           <div>
             <div
@@ -77,7 +82,12 @@ function finishWorkout() {
               :key="i"
               class="flex gap-2 mt-2"
             >
-              <div class="w-8">{{ i + 1 }}</div>
+              <UInput
+                :ui="{ base: 'w-8 bg-(--ui-bg-muted)! text-center' }"
+                variant="soft"
+                :value="i + 1"
+                readonly
+              />
               <UInput
                 v-model="set.weight"
                 type="number"
@@ -92,15 +102,18 @@ function finishWorkout() {
               />
               <UButton
                 variant="ghost"
-                color="error"
+                color="neutral"
+                class="w-8 justify-center"
+                size="xs"
                 :disabled="exercise.sets.length < 2"
               >
-                <UIcon name="lucide:trash" />
+                <UIcon name="lucide:ellipsis-vertical" size="16" />
               </UButton>
             </div>
           </div>
           <UButton
-            class="mt-2"
+            class="w-full mt-2 justify-center bg-(--ui-bg-elevated)"
+            variant="soft"
             @click="workoutStore.addSetToExercise(exercise)"
           >
             <UIcon name="lucide:plus" />
