@@ -1,9 +1,9 @@
 <template>
   <div>
-    <AppHeader />
+    <AppHeaderDefault />
     <AppNav />
-    <div class="px-4 pt-16 pb-18">
+    <main class="px-4 pt-16 pb-18">
       <slot />
-    </div>
+    </main>
   </div>
 </template>
