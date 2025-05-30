@@ -1,9 +1,9 @@
-export interface ExerciseSet {
+interface ExerciseSet {
   weight: number;
   reps: number;
 }
 
-export interface Exercise {
+interface Exercise {
   id: string;
   name: string;
   sets: ExerciseSet[];
@@ -73,8 +73,23 @@ export const useWorkoutStore = defineStore("workout", () => {
     };
   }
 
+  function removeExercise(exercise: Exercise) {
+    if (!workout.value) return;
+
+    const index = workout.value.exercises.indexOf(exercise);
+    if (index !== -1) {
+      workout.value.exercises.splice(index, 1);
+    }
+  }
+
   function addSetToExercise(exercise: Exercise) {
     exercise.sets.push({ weight: 0, reps: 0 });
+  }
+
+  function removeLastSetFromExercise(exercise: Exercise) {
+    if (exercise.sets.length > 0) {
+      exercise.sets.pop();
+    }
   }
 
   function finishWorkout() {
@@ -95,7 +110,9 @@ export const useWorkoutStore = defineStore("workout", () => {
     workout,
     startNewSession,
     addExercises,
+    removeExercise,
     addSetToExercise,
+    removeLastSetFromExercise,
     finishWorkout,
     cancelWorkout,
   };

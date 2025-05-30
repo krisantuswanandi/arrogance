@@ -74,7 +74,6 @@ function finishWorkout() {
             <div class="w-8">Set</div>
             <div class="flex-1">Weight</div>
             <div class="flex-1">Reps</div>
-            <div class="w-8" />
           </div>
           <div>
             <div
@@ -100,25 +99,43 @@ function finishWorkout() {
                 class="flex-1"
                 placeholder="Reps"
               />
-              <UButton
-                variant="ghost"
-                color="neutral"
-                class="w-8 justify-center"
-                size="xs"
-                :disabled="exercise.sets.length < 2"
-              >
-                <UIcon name="lucide:ellipsis-vertical" size="16" />
-              </UButton>
             </div>
           </div>
-          <UButton
-            class="w-full mt-2 justify-center bg-(--ui-bg-elevated)"
-            variant="soft"
-            @click="workoutStore.addSetToExercise(exercise)"
-          >
-            <UIcon name="lucide:plus" />
-            Add set
-          </UButton>
+          <div class="flex gap-1 mt-2">
+            <UButton
+              class="flex-1 justify-center bg-(--ui-bg-elevated)"
+              variant="soft"
+              @click="workoutStore.addSetToExercise(exercise)"
+            >
+              <UIcon name="lucide:plus" />
+              Add set
+            </UButton>
+            <UDropdownMenu
+              :items="[
+                {
+                  label: 'Delete exercise',
+                  onSelect() {
+                    workoutStore.removeExercise(exercise);
+                  },
+                },
+                {
+                  label: 'Delete set',
+                  disabled: exercise.sets.length === 0,
+                  onSelect() {
+                    workoutStore.removeLastSetFromExercise(exercise);
+                  },
+                },
+              ]"
+            >
+              <UButton
+                class="w-10 justify-center bg-(--ui-bg-elevated)"
+                variant="soft"
+                color="neutral"
+              >
+                <UIcon name="lucide:ellipsis-vertical" />
+              </UButton>
+            </UDropdownMenu>
+          </div>
         </div>
       </div>
       <div class="mt-8">
