@@ -7,7 +7,8 @@ const workoutStore = useWorkoutStore();
 const exerciseStore = useExerciseStore();
 const router = useRouter();
 
-const newExercises = ref<string[]>([]);
+const selectedExercise = ref<string>();
+const modalExerciseOpen = ref(false);
 
 onMounted(() => {
   if (!workoutStore.workout) router.push("/");
@@ -19,12 +20,13 @@ watch(workout, (val) => {
   if (!val) router.push("/");
 });
 
-function addExercises() {
-  if (!newExercises.value.length) return;
-
-  workoutStore.addExercises(newExercises.value);
-  newExercises.value = [];
-}
+watch(selectedExercise, (val) => {
+  if (val) {
+    workoutStore.addExercises([val]);
+    selectedExercise.value = undefined;
+    modalExerciseOpen.value = false;
+  }
+});
 
 function cancelWorkout() {
   workoutStore.cancelWorkout();
@@ -120,7 +122,7 @@ function finishWorkout() {
                 },
                 {
                   label: 'Delete set',
-                  disabled: exercise.sets.length === 0,
+                  disabled: exercise.sets.length <= 1,
                   onSelect() {
                     workoutStore.removeLastSetFromExercise(exercise);
                   },
@@ -138,18 +140,13 @@ function finishWorkout() {
           </div>
         </div>
       </div>
-      <div class="mt-8">
-        <USelect
-          v-model="newExercises"
-          :items="exerciseStore.exercises"
-          label-key="name"
-          value-key="id"
-          class="w-full"
-          multiple
-        />
-        <UButton class="mt-2" @click="addExercises">Add exercises</UButton>
+      <div class="mt-8 flex justify-center">
+        <UButton class="px-12" @click="modalExerciseOpen = true">
+          <UIcon name="lucide:plus" />
+          Add exercise
+        </UButton>
       </div>
-      <div class="mt-8 py-8 flex flex-col justify-center items-center">
+      <div class="mt-16 py-8 flex flex-col justify-center items-center">
         <UButton class="mt-2 px-8" @click="finishWorkout">
           Finish Workout
         </UButton>
@@ -162,6 +159,22 @@ function finishWorkout() {
           Cancel Workout
         </UButton>
       </div>
+
+      <UModal v-model:open="modalExerciseOpen" title="Add exercise">
+        <template #body>
+          <USelectMenu
+            v-model="selectedExercise"
+            class="w-full"
+            label-key="name"
+            value-key="id"
+            :items="exerciseStore.exercises"
+            :search-input="{
+              placeholder: 'Search exercises...',
+              autofocus: true,
+            }"
+          />
+        </template>
+      </UModal>
     </NuxtLayout>
   </div>
 </template>
