@@ -16,6 +16,17 @@ onMounted(() => {
 
 const workout = computed(() => workoutStore.workout);
 
+// Filter out exercises that are already in the workout
+const availableExercises = computed(() => {
+  if (!workout.value) return [];
+  if (!exerciseStore.exercises) return [];
+
+  const workoutExerciseIds = workout.value.exercises.map((ex) => ex.id);
+  return exerciseStore.exercises.filter(
+    (ex) => !workoutExerciseIds.includes(ex.id)
+  );
+});
+
 watch(workout, (val) => {
   if (!val) router.push("/");
 });
@@ -162,12 +173,19 @@ function finishWorkout() {
 
       <UModal v-model:open="modalExerciseOpen" title="Add exercise">
         <template #body>
+          <div
+            v-if="availableExercises.length === 0"
+            class="text-center py-4 text-(--ui-text-muted)"
+          >
+            All exercises have been added
+          </div>
           <USelectMenu
+            v-else
             v-model="selectedExercise"
             class="w-full"
             label-key="name"
             value-key="id"
-            :items="exerciseStore.exercises"
+            :items="availableExercises"
             :search-input="{
               placeholder: 'Search exercises...',
               autofocus: true,
