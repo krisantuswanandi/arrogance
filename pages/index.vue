@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
+import { format } from "date-fns";
 
 const routineStore = useRoutineStore();
 const exerciseStore = useExerciseStore();
@@ -30,7 +31,7 @@ const routineOptions = computed<DropdownMenuItem[][]>(() => {
       onSelect() {
         startNewSession(
           routine.name,
-          routine.exercises.map((e) => e.id),
+          routine.exercises.map((e) => e.id)
         );
       },
     })),
@@ -60,7 +61,7 @@ function startNewSession(name: string, exercises: string[]) {
         class="border border-(--ui-border-muted) rounded p-2 mt-4"
       >
         <div class="font-bold">{{ history.workout.name }}</div>
-        <div>{{ history.workout.date.toDateString() }}</div>
+        <div>{{ format(history.workout.date, "d MMM yyyy, HH:mm") }}</div>
         <div
           v-for="exercise in history.workout.exercises"
           :key="exercise.id"

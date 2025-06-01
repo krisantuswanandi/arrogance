@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { format } from "date-fns";
+
 definePageMeta({
   layout: false,
 });
@@ -85,7 +87,7 @@ function openAddExercise(
           {{ workout.name }}
         </div>
         <div class="text-sm">
-          {{ workout.date.toDateString() }}
+          {{ format(workout.date, "d MMM yyyy, HH:mm") }}
         </div>
       </div>
       <div>
