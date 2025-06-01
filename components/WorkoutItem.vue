@@ -16,6 +16,8 @@ const emit = defineEmits<{
   ): void;
 }>();
 
+const isRecordModalOpen = ref(false);
+
 const dropdownItems = computed<DropdownMenuItem[][]>(() => {
   return [
     [
@@ -43,8 +45,17 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => {
 
 <template>
   <div class="border-b border-(--ui-border) py-6">
-    <div class="text-sm font-bold">{{ exercise.name }}</div>
-    <div class="flex gap-2 mt-2 text-xs text-(--ui-text-muted) font-semibold">
+    <div class="flex items-center gap-1">
+      <div class="text-sm font-bold">{{ exercise.name }}</div>
+      <UButton
+        class="text-(--ui-text-dimmed)"
+        icon="lucide:info"
+        variant="ghost"
+        color="neutral"
+        @click="isRecordModalOpen = true"
+      />
+    </div>
+    <div class="flex gap-2 mt-2 text-xs text-(--ui-text-dimmed) font-semibold">
       <div class="w-8">Set</div>
       <div class="flex-1">Weight</div>
       <div class="flex-1">Reps</div>
@@ -68,13 +79,18 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => {
       </UButton>
       <UDropdownMenu :items="dropdownItems" :content="{ align: 'end' }">
         <UButton
-          class="w-10 justify-center bg-(--ui-bg-elevated)"
+          class="px-2 justify-center bg-(--ui-bg-elevated)"
+          icon="lucide:ellipsis-vertical"
           variant="soft"
           color="neutral"
-        >
-          <UIcon name="lucide:ellipsis-vertical" />
-        </UButton>
+        />
       </UDropdownMenu>
     </div>
+
+    <RecordModal
+      v-model:open="isRecordModalOpen"
+      :exercise-id="exercise.id"
+      :exercise-name="exercise.name"
+    />
   </div>
 </template>

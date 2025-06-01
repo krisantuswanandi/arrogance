@@ -6,11 +6,10 @@ import {
   serverTimestamp,
   doc,
 } from "firebase/firestore";
-import type { ExerciseSet } from "./workout";
 
 export interface ExerciseRecord {
-  bestSet: ExerciseSet;
-  lastSets: ExerciseSet[];
+  bestSet: WorkoutSet;
+  lastSets: WorkoutSet[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -100,7 +99,7 @@ async function updateRecords(
   await Promise.all(recordsUpdate);
 }
 
-function getBestSet(currentSets: ExerciseSet[], currentBest?: ExerciseSet) {
+function getBestSet(currentSets: WorkoutSet[], currentBest?: WorkoutSet) {
   const combinedSets = [...(currentBest ? [currentBest] : []), ...currentSets];
   const sortedSets = combinedSets.sort((a, b) => {
     if (b.weight === a.weight) {
