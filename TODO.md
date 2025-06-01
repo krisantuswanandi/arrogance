@@ -1,8 +1,8 @@
 - start workout routine from history
 - save history as new routine
 - save new routine when finishing workout
-- marker for drop set and warm up set
 - add rest time timer in active workout
 - add /edit notes in active workout
 - edit routine name in active workout
-- add workout exercise above / below certain exercise
+- connect to google
+- show workout record best set and last sets

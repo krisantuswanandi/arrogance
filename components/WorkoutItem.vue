@@ -50,26 +50,12 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => {
       <div class="flex-1">Reps</div>
     </div>
     <div>
-      <div v-for="(set, i) in exercise.sets" :key="i" class="flex gap-2 mt-2">
-        <UInput
-          :ui="{ base: 'w-8 bg-(--ui-bg-muted)! text-center' }"
-          variant="soft"
-          :value="i + 1"
-          readonly
-        />
-        <UInput
-          v-model="set.weight"
-          type="number"
-          class="flex-1"
-          placeholder="Weight"
-        />
-        <UInput
-          v-model="set.reps"
-          type="number"
-          class="flex-1"
-          placeholder="Reps"
-        />
-      </div>
+      <WorkoutSetItem
+        v-for="(_set, i) in exercise.sets"
+        :key="i"
+        :exercise="exercise"
+        :set-index="i"
+      />
     </div>
     <div class="flex gap-1 mt-2">
       <UButton
@@ -80,7 +66,7 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => {
         <UIcon name="lucide:plus" />
         Add set
       </UButton>
-      <UDropdownMenu :items="dropdownItems">
+      <UDropdownMenu :items="dropdownItems" :content="{ align: 'end' }">
         <UButton
           class="w-10 justify-center bg-(--ui-bg-elevated)"
           variant="soft"

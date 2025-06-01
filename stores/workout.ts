@@ -1,6 +1,8 @@
+export type WorkoutSetType = "normal" | "drop" | "warmup";
 export interface WorkoutSet {
   weight: number;
   reps: number;
+  type?: WorkoutSetType;
 }
 
 export interface WorkoutExercise {
@@ -81,7 +83,7 @@ export const useWorkoutStore = defineStore("workout", () => {
     return {
       id: exercise.id,
       name: exercise.name,
-      sets: [{ weight: 0, reps: 0 }],
+      sets: [{ weight: 0, reps: 0, type: "normal" }],
     };
   }
 
@@ -94,8 +96,11 @@ export const useWorkoutStore = defineStore("workout", () => {
     }
   }
 
-  function addSetToExercise(exercise: WorkoutExercise) {
-    exercise.sets.push({ weight: 0, reps: 0 });
+  function addSetToExercise(
+    exercise: WorkoutExercise,
+    type: WorkoutSetType = "normal"
+  ) {
+    exercise.sets.push({ weight: 0, reps: 0, type });
   }
 
   function removeLastSetFromExercise(exercise: WorkoutExercise) {
