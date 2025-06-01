@@ -3,12 +3,17 @@ definePageMeta({
   layout: false,
 });
 
+type ModalExerciseData = {
+  targetExercise: WorkoutExercise;
+  position: "before" | "after";
+};
+
 const workoutStore = useWorkoutStore();
 const exerciseStore = useExerciseStore();
 const router = useRouter();
 
-const selectedExercise = ref<string>();
-const modalExerciseOpen = ref(false);
+const modalExerciseOpen = ref<boolean>(false);
+const modalExerciseData = ref<ModalExerciseData | undefined>();
 
 onMounted(() => {
   if (!workoutStore.workout) router.push("/");
@@ -31,13 +36,14 @@ watch(workout, (val) => {
   if (!val) router.push("/");
 });
 
-watch(selectedExercise, (val) => {
-  if (val) {
-    workoutStore.addExercises([val]);
-    selectedExercise.value = undefined;
-    modalExerciseOpen.value = false;
-  }
-});
+function handleExerciseSelect(exerciseId: string) {
+  if (!exerciseId) return;
+
+  workoutStore.addExercise(exerciseId, modalExerciseData.value);
+
+  modalExerciseOpen.value = false;
+  modalExerciseData.value = undefined;
+}
 
 function cancelWorkout() {
   workoutStore.cancelWorkout();
@@ -47,6 +53,14 @@ function cancelWorkout() {
 function finishWorkout() {
   workoutStore.finishWorkout();
   router.push("/");
+}
+
+function openAddExercise(
+  targetExercise: WorkoutExercise,
+  position: "before" | "after"
+) {
+  modalExerciseOpen.value = true;
+  modalExerciseData.value = { targetExercise, position };
 }
 </script>
 
@@ -75,81 +89,16 @@ function finishWorkout() {
         </div>
       </div>
       <div>
-        <div
+        <WorkoutItem
           v-for="exercise in workout.exercises"
           :key="exercise.id"
-          class="border-b border-(--ui-border) py-6"
-        >
-          <div class="text-sm font-bold">{{ exercise.name }}</div>
-          <div
-            class="flex gap-2 mt-2 text-xs text-(--ui-text-muted) font-semibold"
-          >
-            <div class="w-8">Set</div>
-            <div class="flex-1">Weight</div>
-            <div class="flex-1">Reps</div>
-          </div>
-          <div>
-            <div
-              v-for="(set, i) in exercise.sets"
-              :key="i"
-              class="flex gap-2 mt-2"
-            >
-              <UInput
-                :ui="{ base: 'w-8 bg-(--ui-bg-muted)! text-center' }"
-                variant="soft"
-                :value="i + 1"
-                readonly
-              />
-              <UInput
-                v-model="set.weight"
-                type="number"
-                class="flex-1"
-                placeholder="Weight"
-              />
-              <UInput
-                v-model="set.reps"
-                type="number"
-                class="flex-1"
-                placeholder="Reps"
-              />
-            </div>
-          </div>
-          <div class="flex gap-1 mt-2">
-            <UButton
-              class="flex-1 justify-center bg-(--ui-bg-elevated)"
-              variant="soft"
-              @click="workoutStore.addSetToExercise(exercise)"
-            >
-              <UIcon name="lucide:plus" />
-              Add set
-            </UButton>
-            <UDropdownMenu
-              :items="[
-                {
-                  label: 'Delete exercise',
-                  onSelect() {
-                    workoutStore.removeExercise(exercise);
-                  },
-                },
-                {
-                  label: 'Delete set',
-                  disabled: exercise.sets.length <= 1,
-                  onSelect() {
-                    workoutStore.removeLastSetFromExercise(exercise);
-                  },
-                },
-              ]"
-            >
-              <UButton
-                class="w-10 justify-center bg-(--ui-bg-elevated)"
-                variant="soft"
-                color="neutral"
-              >
-                <UIcon name="lucide:ellipsis-vertical" />
-              </UButton>
-            </UDropdownMenu>
-          </div>
-        </div>
+          :exercise="exercise"
+          @add-set="workoutStore.addSetToExercise(exercise)"
+          @remove-set="workoutStore.removeLastSetFromExercise(exercise)"
+          @remove-exercise="workoutStore.removeExercise(exercise)"
+          @add-exercise-before="openAddExercise(exercise, 'before')"
+          @add-exercise-after="openAddExercise(exercise, 'after')"
+        />
       </div>
       <div class="mt-8 flex justify-center">
         <UButton class="px-12" @click="modalExerciseOpen = true">
@@ -181,7 +130,6 @@ function finishWorkout() {
           </div>
           <USelectMenu
             v-else
-            v-model="selectedExercise"
             class="w-full"
             label-key="name"
             value-key="id"
@@ -190,6 +138,7 @@ function finishWorkout() {
               placeholder: 'Search exercises...',
               autofocus: true,
             }"
+            @update:model-value="handleExerciseSelect"
           />
         </template>
       </UModal>

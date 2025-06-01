@@ -1,19 +1,19 @@
-interface ExerciseSet {
+export interface WorkoutSet {
   weight: number;
   reps: number;
 }
 
-interface Exercise {
+export interface WorkoutExercise {
   id: string;
   name: string;
-  sets: ExerciseSet[];
+  sets: WorkoutSet[];
 }
 
 export interface Workout {
   name: string;
   date: Date;
   notes: string;
-  exercises: Exercise[];
+  exercises: WorkoutExercise[];
 }
 
 export type Workouts = Record<string, Workout | undefined>;
@@ -46,22 +46,34 @@ export const useWorkoutStore = defineStore("workout", () => {
       exercises: [],
     };
 
-    addExercises(exerciseIds);
+    exerciseIds.forEach((id) => addExercise(id));
   }
 
-  function addExercises(ids: string | string[]) {
+  function addExercise(
+    id: string,
+    options?: {
+      targetExercise: WorkoutExercise;
+      position: "before" | "after";
+    }
+  ) {
     if (!workout.value) return;
-    if (!Array.isArray(ids)) ids = [ids];
 
+    const exercise = createNewExercise(id);
     const exercises = workout.value.exercises;
 
-    ids.forEach((id) => {
-      const exercise = createNewExercise(id);
+    if (!options) {
       exercises.push(exercise);
-    });
+      return;
+    }
+
+    const index = exercises.indexOf(options.targetExercise);
+    if (index !== -1) {
+      const insertIndex = options.position === "before" ? index : index + 1;
+      exercises.splice(insertIndex, 0, exercise);
+    }
   }
 
-  function createNewExercise(id: string): Exercise {
+  function createNewExercise(id: string): WorkoutExercise {
     const exercise = exerciseStore.exercises!.find(
       (exercise) => exercise.id === id
     )!;
@@ -73,7 +85,7 @@ export const useWorkoutStore = defineStore("workout", () => {
     };
   }
 
-  function removeExercise(exercise: Exercise) {
+  function removeExercise(exercise: WorkoutExercise) {
     if (!workout.value) return;
 
     const index = workout.value.exercises.indexOf(exercise);
@@ -82,11 +94,11 @@ export const useWorkoutStore = defineStore("workout", () => {
     }
   }
 
-  function addSetToExercise(exercise: Exercise) {
+  function addSetToExercise(exercise: WorkoutExercise) {
     exercise.sets.push({ weight: 0, reps: 0 });
   }
 
-  function removeLastSetFromExercise(exercise: Exercise) {
+  function removeLastSetFromExercise(exercise: WorkoutExercise) {
     if (exercise.sets.length > 0) {
       exercise.sets.pop();
     }
@@ -109,7 +121,7 @@ export const useWorkoutStore = defineStore("workout", () => {
   return {
     workout,
     startNewSession,
-    addExercises,
+    addExercise,
     removeExercise,
     addSetToExercise,
     removeLastSetFromExercise,
