@@ -100,6 +100,7 @@ function openAddExercise(
           @remove-exercise="workoutStore.removeExercise(exercise)"
           @add-exercise-before="openAddExercise(exercise, 'before')"
           @add-exercise-after="openAddExercise(exercise, 'after')"
+          @add-drop-set="workoutStore.addSetToExercise(exercise, 'drop')"
         />
       </div>
       <div class="mt-8 flex justify-center">

@@ -20,7 +20,10 @@ function getSetNumber(index: number) {
 
   let count = 0;
   for (let i = 0; i <= index; i++) {
-    if (exerciseRecord.value.lastSets[i].type === "normal") {
+    if (
+      !exerciseRecord.value.lastSets[i].type || // Backwards compatibility, handle old records without type
+      exerciseRecord.value.lastSets[i].type === "normal"
+    ) {
       count++;
     }
   }

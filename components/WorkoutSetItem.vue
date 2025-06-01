@@ -46,8 +46,13 @@ const setTypesOptions = computed((): DropdownMenuItem[] =>
         <UIcon
           v-if="currentSet.type === 'drop'"
           name="lucide:arrow-down-right"
+          class="text-(--ui-text-dimmed)"
         />
-        <UIcon v-else-if="currentSet.type === 'warmup'" name="lucide:flame" />
+        <UIcon
+          v-else-if="currentSet.type === 'warmup'"
+          name="lucide:flame"
+          class="text-(--ui-text-dimmed)"
+        />
         <span v-else>{{ setNumber }}</span>
       </UButton>
     </UDropdownMenu>

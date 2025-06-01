@@ -13,6 +13,7 @@ const emit = defineEmits<{
       | "remove-exercise"
       | "add-exercise-before"
       | "add-exercise-after"
+      | "add-drop-set"
   ): void;
 }>();
 
@@ -28,6 +29,10 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => {
       {
         label: "Add exercise after",
         onSelect: () => emit("add-exercise-after"),
+      },
+      {
+        label: "Add drop set",
+        onSelect: () => emit("add-drop-set"),
       },
       {
         label: "Delete exercise",
