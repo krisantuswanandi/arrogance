@@ -100,7 +100,16 @@ export const useWorkoutStore = defineStore("workout", () => {
     exercise: WorkoutExercise,
     type: WorkoutSetType = "normal"
   ) {
-    exercise.sets.push({ weight: 0, reps: 0, type });
+    let lastSet = { weight: 0, reps: 0 };
+    if (exercise.sets.length > 0) {
+      lastSet = exercise.sets[exercise.sets.length - 1];
+    }
+
+    exercise.sets.push({
+      weight: lastSet.weight,
+      reps: lastSet.reps,
+      type,
+    });
   }
 
   function removeLastSetFromExercise(exercise: WorkoutExercise) {
