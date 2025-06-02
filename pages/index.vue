@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
-import { format } from "date-fns";
 
 const routineStore = useRoutineStore();
 const exerciseStore = useExerciseStore();
@@ -55,26 +54,8 @@ function startNewSession(name: string, exercises: string[]) {
   <div>
     <h1 class="text-sm font-semibold">Histories</h1>
     <ol class="mt-4">
-      <li
-        v-for="history in historyStore.histories"
-        :key="history.id"
-        class="border border-(--ui-border-muted) rounded p-2 mt-4"
-      >
-        <div class="font-bold">{{ history.workout.name }}</div>
-        <div>{{ format(history.workout.date, "d MMM yyyy, HH:mm") }}</div>
-        <div
-          v-for="exercise in history.workout.exercises"
-          :key="exercise.id"
-          class="mt-4"
-        >
-          <div class="font-bold">{{ exercise.name }}</div>
-          <div>
-            <div v-for="(set, i) in exercise.sets" :key="i" class="flex gap-2">
-              <div class="w-4">{{ i + 1 }}.</div>
-              <div>{{ set.weight }} x {{ set.reps }}</div>
-            </div>
-          </div>
-        </div>
+      <li v-for="history in historyStore.histories" :key="history.id">
+        <HistoryItem :workout="history.workout" />
       </li>
     </ol>
     <FloatingButton>

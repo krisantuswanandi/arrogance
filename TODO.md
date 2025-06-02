@@ -6,3 +6,4 @@
 - edit routine name in active workout
 - connect to google
 - show workout record best set and last sets
+- share via whatsapp
