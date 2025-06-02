@@ -91,7 +91,7 @@ function openAddExercise(
         </div>
       </div>
       <div>
-        <WorkoutItem
+        <WorkoutExerciseItem
           v-for="exercise in workout.exercises"
           :key="exercise.id"
           :exercise="exercise"
