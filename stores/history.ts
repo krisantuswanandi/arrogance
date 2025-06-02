@@ -40,9 +40,14 @@ export const useHistoryStore = defineStore("history", () => {
     addHistoryTemp({ profile: activeProfileId.value, workout });
   }
 
+  // history selected for detail view
+  // intentionally cleared when page reloads
+  const selectedHistory = ref<WorkoutHistory | null>(null);
+
   return {
     histories,
     add,
+    selectedHistory,
   };
 });
 

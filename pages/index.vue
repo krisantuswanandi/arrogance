@@ -48,6 +48,11 @@ function startNewSession(name: string, exercises: string[]) {
   workoutStore.startNewSession(name, exercises);
   router.push("/workout");
 }
+
+function openHistoryDetail(history: WorkoutHistory) {
+  historyStore.selectedHistory = history;
+  router.push("/history");
+}
 </script>
 
 <template>
@@ -55,7 +60,7 @@ function startNewSession(name: string, exercises: string[]) {
     <h1 class="text-sm font-semibold">Histories</h1>
     <ol class="mt-4">
       <li v-for="history in historyStore.histories" :key="history.id">
-        <HistoryItem :history="history" />
+        <HistoryItem :history="history" @click="openHistoryDetail(history)" />
       </li>
     </ol>
     <FloatingButton>

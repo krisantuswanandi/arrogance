@@ -4,11 +4,16 @@ import { format } from "date-fns";
 defineProps<{
   history: WorkoutHistory;
 }>();
+
+defineEmits<{
+  (e: "click"): void;
+}>();
 </script>
 
 <template>
   <div
     class="block border border-(--ui-border-muted)/30 rounded p-2 mt-4 bg-(--ui-bg-muted)/50"
+    @click="$emit('click')"
   >
     <div class="font-bold">{{ history.workout.name }}</div>
     <div class="text-xs text-(--ui-text-muted)">
