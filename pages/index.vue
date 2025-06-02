@@ -55,7 +55,7 @@ function startNewSession(name: string, exercises: string[]) {
     <h1 class="text-sm font-semibold">Histories</h1>
     <ol class="mt-4">
       <li v-for="history in historyStore.histories" :key="history.id">
-        <HistoryItem :workout="history.workout" />
+        <HistoryItem :history="history" />
       </li>
     </ol>
     <FloatingButton>

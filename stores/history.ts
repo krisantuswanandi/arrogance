@@ -10,7 +10,7 @@ import {
   and,
 } from "firebase/firestore";
 
-export interface History {
+export interface WorkoutHistory {
   id: string;
   workout: Workout;
   createdAt: Date;
@@ -23,7 +23,7 @@ export const useHistoryStore = defineStore("history", () => {
 
   const activeProfileId = computed(() => profileStore.active?.id);
 
-  const { data: histories } = useQuery<History[]>({
+  const { data: histories } = useQuery<WorkoutHistory[]>({
     key: () => ["histories", activeProfileId.value || ""],
     query: () => fetchHistories(activeProfileId.value),
   });
@@ -68,7 +68,7 @@ async function fetchHistories(profile?: string) {
         },
         createdAt: data.createdAt.toDate(),
         updatedAt: data.updatedAt.toDate(),
-      } satisfies History;
+      } satisfies WorkoutHistory;
     })
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
