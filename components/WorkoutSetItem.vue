@@ -32,6 +32,12 @@ const setTypesOptions = computed((): DropdownMenuItem[] =>
     onSelect: () => (currentSet.value.type = setType.type),
   }))
 );
+
+// Handler to select all text in an input field when focused
+const selectAllOnFocus = (event: FocusEvent) => {
+  const input = event.target as HTMLInputElement;
+  input.select();
+};
 </script>
 
 <template>
@@ -61,12 +67,14 @@ const setTypesOptions = computed((): DropdownMenuItem[] =>
       type="number"
       class="flex-1"
       placeholder="Weight"
+      @focus="selectAllOnFocus"
     />
     <UInput
       v-model="currentSet.reps"
       type="number"
       class="flex-1"
       placeholder="Reps"
+      @focus="selectAllOnFocus"
     />
   </div>
 </template>
