@@ -19,7 +19,6 @@ This is a comprehensive workout tracking application built with Nuxt.js that all
 - **UI Components**: [Nuxt UI v3](https://ui.nuxt.com/) with Tailwind CSS
 - **Icons**: Lucide icons via @iconify-json/lucide
 - **Utilities**: [VueUse](https://vueuse.org/) for composition utilities
-- **Analytics**: Vercel Analytics
 - **Type Safety**: TypeScript throughout
 
 ## Project Architecture
@@ -36,7 +35,6 @@ This is a comprehensive workout tracking application built with Nuxt.js that all
 
 ### Core Store Modules
 
-- `stores/account.ts`: Anonymous authentication and initial data setup
 - `stores/profile.ts`: User profile management (multi-profile support)
 - `stores/exercise.ts`: Exercise definitions and CRUD operations
 - `stores/routine.ts`: Workout routine creation and management
@@ -64,20 +62,43 @@ interface Exercise {
 interface Routine {
   id: string;
   name: string;
-  exercises: Exercise[];
+  exerciseIds: string[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+type WorkoutSetType = "normal" | "drop" | "warmup";
+
+interface WorkoutSet {
+  weight: number;
+  reps: number;
+  type?: WorkoutSetType;
+}
+
+interface WorkoutExercise {
+  id: string;
+  name: string;
+  sets: WorkoutSet[];
 }
 
 interface Workout {
   name: string;
   date: Date;
+  notes: string;
   exercises: WorkoutExercise[];
 }
 
-interface History {
+interface WorkoutHistory {
   id: string;
   workout: Workout;
+  profile: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ExerciseRecord {
+  bestSet: WorkoutSet;
+  lastSets: WorkoutSet[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -88,6 +109,7 @@ interface History {
 ### Firebase Integration
 
 - All data stored in Firestore collections: `profiles`, `exercises`, `routines`, `histories`
+- Profile-specific records stored in subcollection: `profiles/{profileId}/records`
 - User data isolated by Firebase Auth UID
 - Server timestamps for consistent created/updated tracking
 - Query filters by `uid` and `profile` for multi-profile support
@@ -114,11 +136,12 @@ const { mutate: addItem } = useMutation({
 - **List Items**: Reusable item components (ProfileItem, ExerciseItem, RoutineItem)
 - **Navigation**: Bottom navigation with UNavigationMenu
 - **Floating Actions**: FloatingButton component for primary actions
+- **Set Types**: Support for normal, drop, and warmup sets with visual indicators
 
 ### UI/UX Conventions
 
-- **Color System**: Uses Nuxt UI theme with dark/light mode support
-- **Typography**: Geist font family, consistent heading sizes
+- **Color System**: Uses Nuxt UI theme with dark/light mode support (primary color: yellow)
+- **Typography**: System fonts with consistent heading sizes
 - **Layout**: Mobile-first responsive design, max-width container
 - **Interactions**: Dropdown menus for actions, modal forms for creation/editing
 - **State Feedback**: Loading states, optimistic updates via mutations
@@ -130,19 +153,39 @@ const { mutate: addItem } = useMutation({
 - Active profile stored in localStorage (`active-profile`)
 - Profile switching updates data queries across all stores
 - Default profile created on first login
+- Each profile has its own workout history and records
 
 ### Workout Session Flow
 
 1. Start from home page with routine selection or quick start
 2. Navigate to `/workout` page with session state
-3. Add exercises, log sets with weight/reps
-4. Save to history on completion or cancel
+3. Add exercises, log sets with weight/reps/set type
+4. Add additional exercises during workout
+5. Save to history and update records on completion or cancel
+
+### Set Types and Records
+
+- Normal sets are numbered sequentially
+- Drop sets marked with downward arrow icon
+- Warmup sets marked with flame icon
+- Records track best set (by weight/reps) and last workout sets
 
 ### Data Synchronization
 
-- Real-time updates via Firestore listeners
 - Optimistic updates with mutation invalidation
 - Profile-scoped data filtering
+- Local storage for active workout state with serialization
+
+## Planned Features
+
+- Start workout routine from history
+- Save history as new routine
+- Save new routine when finishing workout
+- Add rest time timer in active workout
+- Add/edit notes in active workout
+- Edit routine name in active workout
+- Connect to Google services
+- Share via WhatsApp
 
 ## Development Setup
 
