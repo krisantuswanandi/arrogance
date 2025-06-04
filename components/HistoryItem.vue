@@ -13,8 +13,12 @@ defineEmits<{
 const router = useRouter();
 const workoutStore = useWorkoutStore();
 const exerciseStore = useExerciseStore();
+const routineStore = useRoutineStore();
 
 const hasActiveWorkout = computed(() => !!workoutStore.workout);
+
+const saveAsRoutineModalOpen = ref(false);
+const routineName = ref("");
 
 const options: DropdownMenuItem[][] = [
   [
@@ -40,8 +44,25 @@ const options: DropdownMenuItem[][] = [
         }
       },
     },
+    {
+      label: "Save as routine",
+      onSelect() {
+        routineName.value = props.history.workout.name;
+        saveAsRoutineModalOpen.value = true;
+      },
+    },
   ],
 ];
+
+function saveAsRoutine() {
+  if (!routineName.value) return;
+
+  const exerciseIds = props.history.workout.exercises.map((ex) => ex.id);
+  routineStore.add(routineName.value, exerciseIds);
+
+  routineName.value = "";
+  saveAsRoutineModalOpen.value = false;
+}
 </script>
 
 <template>
@@ -63,5 +84,29 @@ const options: DropdownMenuItem[][] = [
     <div class="text-xs text-(--ui-text-muted)">
       {{ format(history.workout.date, "d MMM yyyy") }}
     </div>
+
+    <UModal
+      v-model:open="saveAsRoutineModalOpen"
+      title="Save as routine"
+      :ui="{ footer: 'justify-end' }"
+    >
+      <template #body>
+        <form id="routineForm" @submit.prevent="saveAsRoutine">
+          <UFormField label="Routine name">
+            <UInput v-model="routineName" autofocus class="w-full" />
+          </UFormField>
+        </form>
+      </template>
+      <template #footer>
+        <UButton
+          variant="outline"
+          color="neutral"
+          @click="saveAsRoutineModalOpen = false"
+        >
+          Cancel
+        </UButton>
+        <UButton type="submit" form="routineForm">Save</UButton>
+      </template>
+    </UModal>
   </div>
 </template>

@@ -1,9 +1,6 @@
-- start workout routine from history
-- save history as new routine
 - save new routine when finishing workout
 - add rest time timer in active workout
 - add /edit notes in active workout
 - edit routine name in active workout
 - connect to google
-- show workout record best set and last sets
 - share via whatsapp
