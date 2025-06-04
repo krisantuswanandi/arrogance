@@ -3,4 +3,3 @@
 - add /edit notes in active workout
 - edit routine name in active workout
 - connect to google
-- share via whatsapp

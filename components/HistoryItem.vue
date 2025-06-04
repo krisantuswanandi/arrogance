@@ -20,6 +20,10 @@ const hasActiveWorkout = computed(() => !!workoutStore.workout);
 const saveAsRoutineModalOpen = ref(false);
 const routineName = ref("");
 
+function shareHistory() {
+  shareWorkout(props.history);
+}
+
 const options: DropdownMenuItem[][] = [
   [
     {
@@ -50,6 +54,10 @@ const options: DropdownMenuItem[][] = [
         routineName.value = props.history.workout.name;
         saveAsRoutineModalOpen.value = true;
       },
+    },
+    {
+      label: "Share",
+      onSelect: shareHistory,
     },
   ],
 ];
