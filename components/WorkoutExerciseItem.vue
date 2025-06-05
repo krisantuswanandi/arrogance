@@ -34,6 +34,8 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => {
         label: "Add drop set",
         onSelect: () => emit("add-drop-set"),
       },
+    ],
+    [
       {
         label: "Delete exercise",
         color: "error",

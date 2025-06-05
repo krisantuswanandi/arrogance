@@ -8,6 +8,8 @@ import {
   addDoc,
   serverTimestamp,
   and,
+  doc,
+  deleteDoc,
 } from "firebase/firestore";
 
 export interface WorkoutHistory {
@@ -34,10 +36,19 @@ export const useHistoryStore = defineStore("history", () => {
     onSettled: () => queryCache.invalidateQueries({ key: ["histories"] }),
   });
 
+  const { mutate: deleteHistoryTemp } = useMutation({
+    mutation: (id: string) => deleteHistory(id),
+    onSettled: () => queryCache.invalidateQueries({ key: ["histories"] }),
+  });
+
   function add(workout: Workout) {
     if (!activeProfileId.value) return;
 
     addHistoryTemp({ profile: activeProfileId.value, workout });
+  }
+
+  function remove(id: string) {
+    deleteHistoryTemp(id);
   }
 
   // history selected for detail view
@@ -47,6 +58,7 @@ export const useHistoryStore = defineStore("history", () => {
   return {
     histories,
     add,
+    remove,
     selectedHistory,
   };
 });
@@ -89,4 +101,10 @@ async function addHistory(profile: string, workout: Workout) {
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
+}
+
+async function deleteHistory(id: string) {
+  const db = getFirestore();
+  const docRef = doc(db, "histories", id);
+  await deleteDoc(docRef);
 }

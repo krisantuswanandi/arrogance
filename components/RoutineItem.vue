@@ -27,6 +27,8 @@ const options = computed(() => {
           editModalOpen.value = true;
         },
       },
+    ],
+    [
       {
         label: "Delete",
         color: "error",

@@ -60,7 +60,11 @@ function openHistoryDetail(history: WorkoutHistory) {
     <h1 class="text-sm font-semibold">Histories</h1>
     <ol class="mt-4">
       <li v-for="history in historyStore.histories" :key="history.id">
-        <HistoryItem :history="history" @click="openHistoryDetail(history)" />
+        <HistoryItem
+          :history="history"
+          @click="openHistoryDetail(history)"
+          @delete="historyStore.remove(history.id)"
+        />
       </li>
     </ol>
     <FloatingButton>

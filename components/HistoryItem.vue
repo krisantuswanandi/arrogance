@@ -7,7 +7,7 @@ const props = defineProps<{
 }>();
 
 defineEmits<{
-  (e: "click"): void;
+  (e: "click" | "delete"): void;
 }>();
 
 const router = useRouter();
@@ -18,6 +18,7 @@ const routineStore = useRoutineStore();
 const hasActiveWorkout = computed(() => !!workoutStore.workout);
 
 const saveAsRoutineModalOpen = ref(false);
+const deleteModalOpen = ref(false);
 const routineName = ref("");
 
 function shareHistory() {
@@ -60,6 +61,15 @@ const options: DropdownMenuItem[][] = [
       onSelect: shareHistory,
     },
   ],
+  [
+    {
+      label: "Delete",
+      color: "error",
+      onSelect() {
+        deleteModalOpen.value = true;
+      },
+    },
+  ],
 ];
 
 function saveAsRoutine() {
@@ -92,29 +102,50 @@ function saveAsRoutine() {
     <div class="text-xs text-(--ui-text-muted)">
       {{ format(history.workout.date, "d MMM yyyy") }}
     </div>
-
-    <UModal
-      v-model:open="saveAsRoutineModalOpen"
-      title="Save as routine"
-      :ui="{ footer: 'justify-end' }"
-    >
-      <template #body>
-        <form id="routineForm" @submit.prevent="saveAsRoutine">
-          <UFormField label="Routine name">
-            <UInput v-model="routineName" autofocus class="w-full" />
-          </UFormField>
-        </form>
-      </template>
-      <template #footer>
-        <UButton
-          variant="outline"
-          color="neutral"
-          @click="saveAsRoutineModalOpen = false"
-        >
-          Cancel
-        </UButton>
-        <UButton type="submit" form="routineForm">Save</UButton>
-      </template>
-    </UModal>
   </div>
+  <UModal
+    v-model:open="saveAsRoutineModalOpen"
+    title="Save as routine"
+    :ui="{ footer: 'justify-end' }"
+  >
+    <template #body>
+      <form id="routineForm" @submit.prevent="saveAsRoutine">
+        <UFormField label="Routine name">
+          <UInput v-model="routineName" autofocus class="w-full" />
+        </UFormField>
+      </form>
+    </template>
+    <template #footer>
+      <UButton
+        variant="outline"
+        color="neutral"
+        @click="saveAsRoutineModalOpen = false"
+      >
+        Cancel
+      </UButton>
+      <UButton type="submit" form="routineForm">Save</UButton>
+    </template>
+  </UModal>
+  <UModal
+    v-model:open="deleteModalOpen"
+    title="Delete history"
+    :ui="{ footer: 'justify-end' }"
+  >
+    <template #body>
+      <p class="text-sm text-(--ui-text-muted)">
+        Deleting this item will permanently remove it from your history. This
+        action cannot be undone. Are you sure?
+      </p>
+    </template>
+    <template #footer>
+      <UButton
+        variant="outline"
+        color="neutral"
+        @click="deleteModalOpen = false"
+      >
+        Cancel
+      </UButton>
+      <UButton color="error" @click="$emit('delete')">Delete</UButton>
+    </template>
+  </UModal>
 </template>
