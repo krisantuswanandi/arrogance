@@ -38,8 +38,14 @@ export const useWorkoutStore = defineStore("workout", () => {
     return workoutByUser.value[profileStore.active.id];
   });
 
-  function startNewSession(name: string, exerciseIds: string[]) {
+  function startNewSession(name: string, exerciseIds: string[] = []) {
     if (!profileStore.active) return;
+    if (!exerciseStore.exercises) return;
+
+    const availableExerciseIds = exerciseStore.exercises.map((ex) => ex.id);
+    const validExerciseIds = exerciseIds.filter((id) =>
+      availableExerciseIds.includes(id)
+    );
 
     workoutByUser.value[profileStore.active.id] = {
       name,
@@ -48,7 +54,7 @@ export const useWorkoutStore = defineStore("workout", () => {
       exercises: [],
     };
 
-    exerciseIds.forEach((id) => addExercise(id));
+    validExerciseIds.forEach((id) => addExercise(id));
   }
 
   function addExercise(

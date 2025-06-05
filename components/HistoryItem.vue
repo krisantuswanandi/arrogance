@@ -12,7 +12,6 @@ defineEmits<{
 
 const router = useRouter();
 const workoutStore = useWorkoutStore();
-const exerciseStore = useExerciseStore();
 const routineStore = useRoutineStore();
 
 const hasActiveWorkout = computed(() => !!workoutStore.workout);
@@ -31,22 +30,9 @@ const options: DropdownMenuItem[][] = [
       label: "Start workout",
       disabled: hasActiveWorkout.value,
       onSelect() {
-        if (!exerciseStore.exercises) return;
-
-        const historyExercises = props.history.workout.exercises;
-        const availableExerciseIds = exerciseStore.exercises.map((ex) => ex.id);
-
-        const hasMissingExercises = historyExercises.some(
-          (exercise) => !availableExerciseIds.includes(exercise.id)
-        );
-
-        if (hasMissingExercises) {
-          alert("Some exercises in this workout no longer exist.");
-        } else {
-          const exercises = props.history.workout.exercises.map((ex) => ex.id);
-          workoutStore.startNewSession(props.history.workout.name, exercises);
-          router.push("/workout");
-        }
+        const exerciseIds = props.history.workout.exercises.map((ex) => ex.id);
+        workoutStore.startNewSession(props.history.workout.name, exerciseIds);
+        router.push("/workout");
       },
     },
     {

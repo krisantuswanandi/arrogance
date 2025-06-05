@@ -13,7 +13,7 @@ const modalRoutineOpen = ref(false);
 
 const defaultRoutineOptions: DropdownMenuItem[] = [
   {
-    label: "New routine",
+    label: "Custom workout",
     icon: "lucide:plus",
     onSelect() {
       modalRoutineOpen.value = true;
@@ -76,7 +76,7 @@ function openHistoryDetail(history: WorkoutHistory) {
         :items="routineOptions"
         :content="{ align: 'end', side: 'top' }"
       >
-        <UButton icon="lucide:plus">New workout</UButton>
+        <UButton icon="lucide:play">Start workout</UButton>
       </UDropdownMenu>
     </FloatingButton>
     <UModal

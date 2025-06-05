@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const routineStore = useRoutineStore();
 const exerciseStore = useExerciseStore();
+const workoutStore = useWorkoutStore();
+const router = useRouter();
 
 const name = ref("");
 const exercises = ref<string[]>([]);
@@ -14,6 +16,12 @@ function addRoutine() {
   exercises.value = [];
   modalRoutineOpen.value = false;
 }
+
+function startNewSession(name: string, exercises: Exercise[]) {
+  const exerciseIds = exercises.map((e) => e.id);
+  workoutStore.startNewSession(name, exerciseIds);
+  router.push("/workout");
+}
 </script>
 
 <template>
@@ -25,6 +33,7 @@ function addRoutine() {
           :name="r.name"
           :exercises="r.exercises"
           @edit="routineStore.edit(r.id, $event.name, $event.exercises)"
+          @start="startNewSession(r.name, r.exercises)"
           @delete="routineStore.remove(r.id)"
         />
       </li>

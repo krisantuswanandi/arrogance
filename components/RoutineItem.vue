@@ -7,7 +7,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "delete"): void;
+  (e: "delete" | "start"): void;
   (e: "edit", param: { name: string; exercises: string[] }): void;
 }>();
 
@@ -25,6 +25,12 @@ const options = computed(() => {
           newName.value = props.name;
           newExercises.value = props.exercises.map((e) => e.id);
           editModalOpen.value = true;
+        },
+      },
+      {
+        label: "Start workout",
+        onSelect() {
+          emit("start");
         },
       },
     ],
