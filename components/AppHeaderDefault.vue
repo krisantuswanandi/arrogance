@@ -47,17 +47,16 @@ function addProfile() {
       <NuxtImg src="/logo.svg" alt="Logo" class="h-6" />
       <span class="text-sm font-semibold">Workout Log</span>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1">
       <UButton
-        class="capitalize"
-        variant="outline"
+        variant="ghost"
         color="neutral"
+        size="lg"
+        :icon="colorMode.value === 'dark' ? 'lucide:moon' : 'lucide:sun'"
         @click="
           colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
         "
-      >
-        {{ colorMode.value }}
-      </UButton>
+      />
       <UDropdownMenu :items="profileOptions" :content="{ align: 'end' }">
         <UButton
           variant="outline"

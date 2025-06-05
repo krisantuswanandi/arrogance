@@ -1,4 +1,4 @@
-- save new routine when finishing workout
+- save new routine when finishing workout (on hold, adding more unnecessary step when finishing workout)
 - add rest time timer in active workout
 - add /edit notes in active workout
 - edit routine name in active workout

@@ -36,10 +36,12 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => {
       },
       {
         label: "Delete exercise",
+        color: "error",
         onSelect: () => emit("remove-exercise"),
       },
       {
         label: "Delete set",
+        color: "error",
         disabled: props.exercise.sets.length <= 1,
         onSelect: () => emit("remove-set"),
       },
