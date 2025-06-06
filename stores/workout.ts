@@ -156,6 +156,21 @@ export const useWorkoutStore = defineStore("workout", () => {
     currentExercise.sets = [{ weight: 0, reps: 0, type: "normal" }];
   }
 
+  function moveExerciseUp(exercise: WorkoutExercise) {
+    if (!workout.value) return;
+
+    const exercises = workout.value.exercises;
+    const index = exercises.indexOf(exercise);
+
+    // If the exercise is already at the top or not found, do nothing
+    if (index <= 0) return;
+
+    // Swap with the exercise above it
+    const temp = exercises[index];
+    exercises[index] = exercises[index - 1];
+    exercises[index - 1] = temp;
+  }
+
   return {
     workout,
     startNewSession,
@@ -164,6 +179,7 @@ export const useWorkoutStore = defineStore("workout", () => {
     addSetToExercise,
     removeLastSetFromExercise,
     changeExercise,
+    moveExerciseUp,
     finishWorkout,
     cancelWorkout,
   };

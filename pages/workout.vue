@@ -140,6 +140,7 @@ function handleChangeExercise(newExerciseId: string) {
           @add-exercise-after="openAddExercise(exercise, 'after')"
           @add-drop-set="workoutStore.addSetToExercise(exercise, 'drop')"
           @change-exercise="openChangeExercise(exercise)"
+          @move-exercise-up="workoutStore.moveExerciseUp(exercise)"
         />
       </div>
       <div class="mt-8 flex justify-center">
