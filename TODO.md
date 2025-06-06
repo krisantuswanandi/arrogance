@@ -5,5 +5,4 @@
 - custom workout starts from blank canvas, no initial data
 - connect to google
 - optimistic updates
-- move workout exercise up/down
 - notes per workout exercise

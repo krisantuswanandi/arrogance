@@ -16,6 +16,7 @@ const emit = defineEmits<{
       | "add-drop-set"
       | "change-exercise"
       | "move-exercise-up"
+      | "move-exercise-down"
   ): void;
 }>();
 
@@ -31,6 +32,10 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => {
       {
         label: "Move exercise up",
         onSelect: () => emit("move-exercise-up"),
+      },
+      {
+        label: "Move exercise down",
+        onSelect: () => emit("move-exercise-down"),
       },
       {
         label: "Add exercise before",
