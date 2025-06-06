@@ -14,6 +14,7 @@ const emit = defineEmits<{
       | "add-exercise-before"
       | "add-exercise-after"
       | "add-drop-set"
+      | "change-exercise"
   ): void;
 }>();
 
@@ -22,6 +23,10 @@ const isRecordModalOpen = ref(false);
 const dropdownItems = computed<DropdownMenuItem[][]>(() => {
   return [
     [
+      {
+        label: "Change exercise",
+        onSelect: () => emit("change-exercise"),
+      },
       {
         label: "Add exercise before",
         onSelect: () => emit("add-exercise-before"),

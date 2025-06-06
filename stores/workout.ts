@@ -138,6 +138,24 @@ export const useWorkoutStore = defineStore("workout", () => {
     workoutByUser.value[profileStore.active!.id] = undefined;
   }
 
+  function changeExercise(
+    currentExercise: WorkoutExercise,
+    newExerciseId: string
+  ) {
+    if (!workout.value) return;
+    if (!exerciseStore.exercises) return;
+
+    const newExerciseData = exerciseStore.exercises.find(
+      (ex) => ex.id === newExerciseId
+    );
+    if (!newExerciseData) return;
+
+    // Change the exercise data
+    currentExercise.id = newExerciseData.id;
+    currentExercise.name = newExerciseData.name;
+    currentExercise.sets = [{ weight: 0, reps: 0, type: "normal" }];
+  }
+
   return {
     workout,
     startNewSession,
@@ -145,6 +163,7 @@ export const useWorkoutStore = defineStore("workout", () => {
     removeExercise,
     addSetToExercise,
     removeLastSetFromExercise,
+    changeExercise,
     finishWorkout,
     cancelWorkout,
   };

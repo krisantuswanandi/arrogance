@@ -10,12 +10,18 @@ type ModalExerciseData = {
   position: "before" | "after";
 };
 
+type ChangeExerciseData = {
+  exercise: WorkoutExercise;
+};
+
 const workoutStore = useWorkoutStore();
 const exerciseStore = useExerciseStore();
 const router = useRouter();
 
 const modalExerciseOpen = ref<boolean>(false);
 const modalExerciseData = ref<ModalExerciseData | undefined>();
+const changeExerciseModalOpen = ref<boolean>(false);
+const changeExerciseData = ref<ChangeExerciseData | undefined>();
 
 onMounted(() => {
   if (!workoutStore.workout) router.push("/");
@@ -29,6 +35,24 @@ const availableExercises = computed(() => {
   if (!exerciseStore.exercises) return [];
 
   const workoutExerciseIds = workout.value.exercises.map((ex) => ex.id);
+  return exerciseStore.exercises.filter(
+    (ex) => !workoutExerciseIds.includes(ex.id)
+  );
+});
+
+// Get all exercises for the change exercise modal
+// For changing exercise, we want to show all exercises except those already in the workout
+const allExercisesExceptCurrent = computed(() => {
+  if (!exerciseStore.exercises) return [];
+  if (!changeExerciseData.value || !workout.value) return [];
+
+  // Get all exercise IDs that are currently in the workout except the one being changed
+  const newExerciseId = changeExerciseData.value.exercise.id;
+  const workoutExerciseIds = workout.value.exercises
+    .filter((ex) => ex.id !== newExerciseId)
+    .map((ex) => ex.id);
+
+  // Only show exercises that aren't already in the workout
   return exerciseStore.exercises.filter(
     (ex) => !workoutExerciseIds.includes(ex.id)
   );
@@ -63,6 +87,20 @@ function openAddExercise(
 ) {
   modalExerciseOpen.value = true;
   modalExerciseData.value = { targetExercise, position };
+}
+
+function openChangeExercise(exercise: WorkoutExercise) {
+  changeExerciseModalOpen.value = true;
+  changeExerciseData.value = { exercise };
+}
+
+function handleChangeExercise(newExerciseId: string) {
+  if (!newExerciseId || !changeExerciseData.value) return;
+
+  workoutStore.changeExercise(changeExerciseData.value.exercise, newExerciseId);
+
+  changeExerciseModalOpen.value = false;
+  changeExerciseData.value = undefined;
 }
 </script>
 
@@ -101,6 +139,7 @@ function openAddExercise(
           @add-exercise-before="openAddExercise(exercise, 'before')"
           @add-exercise-after="openAddExercise(exercise, 'after')"
           @add-drop-set="workoutStore.addSetToExercise(exercise, 'drop')"
+          @change-exercise="openChangeExercise(exercise)"
         />
       </div>
       <div class="mt-8 flex justify-center">
@@ -142,6 +181,29 @@ function openAddExercise(
               autofocus: true,
             }"
             @update:model-value="handleExerciseSelect"
+          />
+        </template>
+      </UModal>
+
+      <UModal v-model:open="changeExerciseModalOpen" title="Change exercise">
+        <template #body>
+          <div
+            v-if="allExercisesExceptCurrent.length === 0"
+            class="text-center py-4 text-(--ui-text-muted)"
+          >
+            No other exercises available
+          </div>
+          <USelectMenu
+            v-else
+            class="w-full"
+            label-key="name"
+            value-key="id"
+            :items="allExercisesExceptCurrent"
+            :search-input="{
+              placeholder: 'Search exercises...',
+              autofocus: true,
+            }"
+            @update:model-value="handleChangeExercise"
           />
         </template>
       </UModal>
