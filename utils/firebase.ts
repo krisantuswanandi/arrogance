@@ -1,5 +1,10 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics, logEvent } from "firebase/analytics";
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from "firebase/firestore";
 
 export function initFirebase() {
   const config = useRuntimeConfig();
@@ -16,6 +21,12 @@ export function initFirebase() {
 
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
+
+  initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager(),
+    }),
+  });
 
   logEvent(analytics, "init_firebase");
 }
