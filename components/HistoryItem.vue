@@ -67,6 +67,11 @@ function saveAsRoutine() {
   routineName.value = "";
   saveAsRoutineModalOpen.value = false;
 }
+
+const truncatedNotes = computed(() => {
+  const notes = props.history.workout.notes || "";
+  return notes.length > 150 ? notes.slice(0, 150) + "..." : notes;
+});
 </script>
 
 <template>
@@ -85,8 +90,9 @@ function saveAsRoutine() {
         />
       </UDropdownMenu>
     </div>
-    <div class="text-xs text-(--ui-text-muted)">
-      {{ format(history.workout.date, "d MMM yyyy") }}
+    <div class="text-sm text-(--ui-text-muted)">
+      <div>{{ format(history.workout.date, "eeee, d MMM") }}</div>
+      <div v-if="truncatedNotes" class="mt-2">{{ truncatedNotes }}</div>
     </div>
   </div>
   <UModal

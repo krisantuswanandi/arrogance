@@ -38,8 +38,15 @@ function goBack() {
         <div class="font-bold">
           {{ history.workout.name }}
         </div>
-        <div class="text-sm">
-          {{ format(history.workout.date, "d MMM yyyy, HH:mm") }}
+        <div class="text-sm flex items-center gap-1 mt-1">
+          <UIcon name="lucide:calendar" />
+          {{ format(history.workout.date, "eeee, d MMM yyyy, HH:mm") }}
+        </div>
+        <div
+          v-if="history.workout.notes"
+          class="text-(--ui-text-muted) whitespace-pre-wrap mt-4 text-sm"
+        >
+          {{ history.workout.notes }}
         </div>
       </div>
 

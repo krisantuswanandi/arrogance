@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { format } from "date-fns";
-
 definePageMeta({
   layout: false,
 });
@@ -22,6 +20,8 @@ const modalExerciseOpen = ref<boolean>(false);
 const modalExerciseData = ref<ModalExerciseData | undefined>();
 const changeExerciseModalOpen = ref<boolean>(false);
 const changeExerciseData = ref<ChangeExerciseData | undefined>();
+const editWorkoutModalOpen = ref<boolean>(false);
+const editWorkoutForm = ref({ name: "", notes: "" });
 
 onMounted(() => {
   if (!workoutStore.workout) router.push("/");
@@ -102,6 +102,28 @@ function handleChangeExercise(newExerciseId: string) {
   changeExerciseModalOpen.value = false;
   changeExerciseData.value = undefined;
 }
+
+function openEditWorkoutModal() {
+  if (!workout.value) return;
+
+  // Reset form data with current workout values
+  editWorkoutForm.value = {
+    name: workout.value.name,
+    notes: workout.value.notes,
+  };
+
+  editWorkoutModalOpen.value = true;
+}
+
+function saveWorkoutEdit() {
+  if (!workout.value) return;
+
+  // Update workout name and notes
+  workout.value.name = editWorkoutForm.value.name;
+  workout.value.notes = editWorkoutForm.value.notes;
+
+  editWorkoutModalOpen.value = false;
+}
 </script>
 
 <template>
@@ -119,13 +141,33 @@ function handleChangeExercise(newExerciseId: string) {
           </UButton>
           <div class="text-sm font-bold">Current Workout</div>
         </div>
+        <UButton
+          variant="ghost"
+          size="xs"
+          color="neutral"
+          @click="openEditWorkoutModal"
+        >
+          <UIcon name="lucide:pencil" size="16" />
+        </UButton>
       </template>
       <div class="border-b border-(--ui-border) pb-4">
         <div class="font-bold">
           {{ workout.name }}
         </div>
-        <div class="text-sm">
-          {{ format(workout.date, "d MMM yyyy, HH:mm") }}
+        <div class="text-sm mt-1" @click="openEditWorkoutModal">
+          <div
+            v-if="workout.notes"
+            class="text-(--ui-text-muted) whitespace-pre-wrap"
+          >
+            {{ workout.notes }}
+          </div>
+          <div
+            v-else
+            class="text-(--ui-text-dimmed)/75 italic"
+            @click="openEditWorkoutModal"
+          >
+            Add description or notes here
+          </div>
         </div>
       </div>
       <div>
@@ -207,6 +249,37 @@ function handleChangeExercise(newExerciseId: string) {
             }"
             @update:model-value="handleChangeExercise"
           />
+        </template>
+      </UModal>
+
+      <UModal
+        v-model:open="editWorkoutModalOpen"
+        title="Edit workout"
+        :ui="{ footer: 'justify-end' }"
+      >
+        <template #body>
+          <form id="form" @submit.prevent="saveWorkoutEdit">
+            <UFormField label="Name">
+              <UInput v-model="editWorkoutForm.name" class="w-full" />
+            </UFormField>
+            <UFormField label="Notes" class="mt-4">
+              <UTextarea
+                v-model="editWorkoutForm.notes"
+                autofocus
+                class="w-full"
+              />
+            </UFormField>
+          </form>
+        </template>
+        <template #footer>
+          <UButton
+            variant="outline"
+            color="neutral"
+            @click="editWorkoutModalOpen = false"
+          >
+            Cancel
+          </UButton>
+          <UButton type="submit" form="form">Save</UButton>
         </template>
       </UModal>
     </NuxtLayout>
