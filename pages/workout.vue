@@ -21,7 +21,7 @@ const modalExerciseData = ref<ModalExerciseData | undefined>();
 const changeExerciseModalOpen = ref<boolean>(false);
 const changeExerciseData = ref<ChangeExerciseData | undefined>();
 const editWorkoutModalOpen = ref<boolean>(false);
-const editWorkoutForm = ref({ name: "", notes: "" });
+const editWorkoutForm = ref({ name: "", notes: "", focus: "" });
 
 onMounted(() => {
   if (!workoutStore.workout) router.push("/");
@@ -103,13 +103,14 @@ function handleChangeExercise(newExerciseId: string) {
   changeExerciseData.value = undefined;
 }
 
-function openEditWorkoutModal() {
+function openEditWorkoutModal(focusTarget = "name") {
   if (!workout.value) return;
 
   // Reset form data with current workout values
   editWorkoutForm.value = {
     name: workout.value.name,
     notes: workout.value.notes,
+    focus: focusTarget,
   };
 
   editWorkoutModalOpen.value = true;
@@ -145,27 +146,23 @@ function saveWorkoutEdit() {
           variant="ghost"
           size="xs"
           color="neutral"
-          @click="openEditWorkoutModal"
+          @click="openEditWorkoutModal()"
         >
           <UIcon name="lucide:pencil" size="16" />
         </UButton>
       </template>
       <div class="border-b border-(--ui-border) pb-4">
-        <div class="font-bold">
+        <div class="font-bold" @click="openEditWorkoutModal()">
           {{ workout.name }}
         </div>
-        <div class="text-sm mt-1" @click="openEditWorkoutModal">
+        <div class="text-sm mt-1" @click="openEditWorkoutModal('notes')">
           <div
             v-if="workout.notes"
             class="text-(--ui-text-muted) whitespace-pre-wrap"
           >
             {{ workout.notes }}
           </div>
-          <div
-            v-else
-            class="text-(--ui-text-dimmed)/75 italic"
-            @click="openEditWorkoutModal"
-          >
+          <div v-else class="text-(--ui-text-dimmed)/75 italic">
             Add description or notes here
           </div>
         </div>
@@ -260,12 +257,16 @@ function saveWorkoutEdit() {
         <template #body>
           <form id="form" @submit.prevent="saveWorkoutEdit">
             <UFormField label="Name">
-              <UInput v-model="editWorkoutForm.name" class="w-full" />
+              <UInput
+                v-model="editWorkoutForm.name"
+                :autofocus="editWorkoutForm.focus === 'name'"
+                class="w-full"
+              />
             </UFormField>
             <UFormField label="Notes" class="mt-4">
               <UTextarea
                 v-model="editWorkoutForm.notes"
-                autofocus
+                :autofocus="editWorkoutForm.focus === 'notes'"
                 class="w-full"
               />
             </UFormField>

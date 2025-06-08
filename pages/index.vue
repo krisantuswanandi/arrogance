@@ -12,7 +12,7 @@ const defaultRoutineOptions: DropdownMenuItem[] = [
     label: "Custom workout",
     icon: "lucide:plus",
     onSelect() {
-      const title = format(new Date(), "dd/MM/yy");
+      const title = format(new Date(), "d MMM");
       startNewSession(`Workout ${title}`, []);
     },
   },
