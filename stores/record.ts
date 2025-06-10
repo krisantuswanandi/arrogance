@@ -10,6 +10,7 @@ import {
 export interface ExerciseRecord {
   bestSet: WorkoutSet;
   lastSets: WorkoutSet[];
+  lastNotes?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -69,6 +70,7 @@ async function fetchRecords(profile?: string) {
     records[doc.id] = {
       bestSet: data.bestSet,
       lastSets: data.lastSets,
+      lastNotes: data.lastNotes,
       createdAt: data.createdAt.toDate(),
       updatedAt: data.updatedAt.toDate(),
     } satisfies ExerciseRecord;
@@ -91,6 +93,7 @@ async function updateRecords(
     setDoc(docRef, {
       bestSet: getBestSet(exercise.sets, lastRecord?.bestSet),
       lastSets: exercise.sets,
+      lastNotes: exercise.notes,
       createdAt: lastRecord?.createdAt || serverTimestamp(),
       updatedAt: serverTimestamp(),
     });

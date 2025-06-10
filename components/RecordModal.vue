@@ -94,7 +94,16 @@ function getSetNumber(index: number) {
             </div>
           </div>
         </div>
+
+        <!-- Notes section -->
+        <div
+          v-if="exerciseRecord.lastNotes"
+          class="text-xs text-(--ui-text-dimmed) whitespace-pre-line mt-4"
+        >
+          {{ exerciseRecord.lastNotes }}
+        </div>
       </div>
+
       <div
         v-else
         class="text-sm text-center py-8 text-(--ui-text-dimmed) italic"
