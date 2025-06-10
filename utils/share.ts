@@ -5,8 +5,12 @@ import { format } from "date-fns";
  */
 export function formatWorkoutForSharing(history: WorkoutHistory): string {
   const { workout } = history;
-  const date = format(workout.date, "d MMM yyyy, HH:mm");
+  const date = format(workout.date, "eeee, d MMM yyyy, HH:mm");
   let shareText = `${workout.name} (${date})\n\n`;
+
+  if (workout.notes) {
+    shareText += `${workout.notes}\n\n`;
+  }
 
   shareText += workout.exercises
     .map((exercise) => {
@@ -25,6 +29,10 @@ export function formatWorkoutForSharing(history: WorkoutHistory): string {
         .join("");
 
       exerciseText += "\n";
+
+      if (exercise.notes) {
+        exerciseText += `Notes: ${exercise.notes}\n\n`;
+      }
 
       return exerciseText;
     })
