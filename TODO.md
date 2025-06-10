@@ -2,5 +2,4 @@
 - add rest time timer in active workout
 - connect to google
 - optimistic updates
-- show exercise record on exercises page
 - open override modal when there is workout in progress

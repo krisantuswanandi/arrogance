@@ -2,6 +2,7 @@
 import type { DropdownMenuItem } from "@nuxt/ui";
 
 const props = defineProps<{
+  id: string;
   name: string;
 }>();
 
@@ -12,10 +13,17 @@ const emit = defineEmits<{
 
 const editModalOpen = ref(false);
 const deleteModalOpen = ref(false);
+const recordModalOpen = ref(false);
 const newName = ref("");
 
 const options: DropdownMenuItem[][] = [
   [
+    {
+      label: "Detail",
+      onSelect() {
+        recordModalOpen.value = true;
+      },
+    },
     {
       label: "Edit",
       onSelect() {
@@ -100,4 +108,9 @@ function editExercise() {
       <UButton color="error" @click="emit('delete')">Delete</UButton>
     </template>
   </UModal>
+  <RecordModal
+    v-model:open="recordModalOpen"
+    :exercise-id="id"
+    :exercise-name="name"
+  />
 </template>

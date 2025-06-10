@@ -18,6 +18,7 @@ function addExercise() {
     <ul class="mt-4">
       <li v-for="i in exerciseStore.exercises" :key="i.id">
         <ExerciseItem
+          :id="i.id"
           :name="i.name"
           @edit="exerciseStore.edit(i.id, $event)"
           @delete="exerciseStore.remove(i.id)"
