@@ -9,6 +9,7 @@ export interface WorkoutExercise {
   id: string;
   name: string;
   sets: WorkoutSet[];
+  notes?: string;
 }
 
 export interface Workout {
@@ -154,6 +155,10 @@ export const useWorkoutStore = defineStore("workout", () => {
     currentExercise.id = newExerciseData.id;
     currentExercise.name = newExerciseData.name;
     currentExercise.sets = [{ weight: 0, reps: 0, type: "normal" }];
+
+    if (currentExercise.notes) {
+      currentExercise.notes = "";
+    }
   }
 
   function moveExercise(exercise: WorkoutExercise, direction: "up" | "down") {

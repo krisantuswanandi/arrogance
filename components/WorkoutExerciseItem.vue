@@ -18,13 +18,24 @@ const emit = defineEmits<{
       | "move-exercise-up"
       | "move-exercise-down"
   ): void;
+  (e: "add-notes", param: string): void;
 }>();
 
 const isRecordModalOpen = ref(false);
+const isNotesModalOpen = ref(false);
+
+const notes = ref("");
 
 const dropdownItems = computed<DropdownMenuItem[][]>(() => {
   return [
     [
+      {
+        label: props.exercise.notes ? "Edit notes" : "Add notes",
+        onSelect: () => {
+          isNotesModalOpen.value = true;
+          notes.value = props.exercise.notes || "";
+        },
+      },
       {
         label: "Change exercise",
         onSelect: () => emit("change-exercise"),
@@ -65,6 +76,11 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => {
     ],
   ];
 });
+
+function saveNotes() {
+  isNotesModalOpen.value = false;
+  emit("add-notes", notes.value);
+}
 </script>
 
 <template>
@@ -79,7 +95,13 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => {
         @click="isRecordModalOpen = true"
       />
     </div>
-    <div class="flex gap-2 mt-2 text-xs text-(--ui-text-dimmed) font-semibold">
+    <div
+      v-if="exercise.notes"
+      class="text-xs text-(--ui-text-dimmed) whitespace-pre-wrap"
+    >
+      {{ exercise.notes }}
+    </div>
+    <div class="flex gap-2 mt-4 text-xs text-(--ui-text-dimmed) font-semibold">
       <div class="w-8">Set</div>
       <div class="flex-1">Weight</div>
       <div class="flex-1">Reps</div>
@@ -116,5 +138,33 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => {
       :exercise-id="exercise.id"
       :exercise-name="exercise.name"
     />
+
+    <UModal
+      v-model:open="isNotesModalOpen"
+      :title="exercise.notes ? 'Edit notes' : 'Add notes'"
+      :ui="{ footer: 'justify-end' }"
+    >
+      <template #body>
+        <form id="form" @submit.prevent="saveNotes">
+          <UFormField label="Notes">
+            <UTextarea
+              v-model="notes"
+              placeholder="Add description or notes here"
+              class="w-full"
+            />
+          </UFormField>
+        </form>
+      </template>
+      <template #footer>
+        <UButton
+          variant="outline"
+          color="neutral"
+          @click="isNotesModalOpen = false"
+        >
+          Cancel
+        </UButton>
+        <UButton type="submit" form="form">Save</UButton>
+      </template>
+    </UModal>
   </div>
 </template>

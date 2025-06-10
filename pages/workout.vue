@@ -181,6 +181,7 @@ function saveWorkoutEdit() {
           @change-exercise="openChangeExercise(exercise)"
           @move-exercise-up="workoutStore.moveExercise(exercise, 'up')"
           @move-exercise-down="workoutStore.moveExercise(exercise, 'down')"
+          @add-notes="exercise.notes = $event"
         />
       </div>
       <div class="mt-8 flex justify-center">

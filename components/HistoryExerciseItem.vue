@@ -22,6 +22,13 @@ const isRecordModalOpen = ref(false);
       />
     </div>
 
+    <div
+      v-if="exercise.notes"
+      class="text-sm text-(--ui-text-dimmed) whitespace-pre-line mb-4"
+    >
+      {{ exercise.notes }}
+    </div>
+
     <div>
       <HistorySetItem
         v-for="(_set, setIndex) in exercise.sets"
