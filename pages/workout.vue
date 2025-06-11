@@ -16,12 +16,13 @@ const workoutStore = useWorkoutStore();
 const exerciseStore = useExerciseStore();
 const router = useRouter();
 
-const modalExerciseOpen = ref<boolean>(false);
+const modalExerciseOpen = ref(false);
 const modalExerciseData = ref<ModalExerciseData | undefined>();
-const changeExerciseModalOpen = ref<boolean>(false);
+const changeExerciseModalOpen = ref(false);
 const changeExerciseData = ref<ChangeExerciseData | undefined>();
-const editWorkoutModalOpen = ref<boolean>(false);
+const editWorkoutModalOpen = ref(false);
 const editWorkoutForm = ref({ name: "", notes: "", focus: "" });
+const timerOpen = ref(false);
 
 onMounted(() => {
   if (!workoutStore.workout) router.push("/");
@@ -142,14 +143,24 @@ function saveWorkoutEdit() {
           </UButton>
           <div class="text-sm font-bold">Current Workout</div>
         </div>
-        <UButton
-          variant="ghost"
-          size="xs"
-          color="neutral"
-          @click="openEditWorkoutModal()"
-        >
-          <UIcon name="lucide:pencil" size="16" />
-        </UButton>
+        <div class="flex items-center gap-2">
+          <UButton
+            variant="ghost"
+            size="xs"
+            color="neutral"
+            @click="timerOpen = true"
+          >
+            <UIcon name="lucide:timer" size="16" />
+          </UButton>
+          <UButton
+            variant="ghost"
+            size="xs"
+            color="neutral"
+            @click="openEditWorkoutModal()"
+          >
+            <UIcon name="lucide:pencil" size="16" />
+          </UButton>
+        </div>
       </template>
       <div class="border-b border-(--ui-border) pb-4">
         <div class="font-bold" @click="openEditWorkoutModal()">
@@ -284,6 +295,7 @@ function saveWorkoutEdit() {
           <UButton type="submit" form="form">Save</UButton>
         </template>
       </UModal>
+      <WorkoutTimer v-if="timerOpen" @close="timerOpen = false" />
     </NuxtLayout>
   </div>
 </template>
