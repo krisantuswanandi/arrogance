@@ -5,7 +5,7 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
-const DEFAULT_MAX_TIME = 2;
+const DEFAULT_MAX_TIME = 120;
 
 const timeLeft = ref(DEFAULT_MAX_TIME);
 const isRunning = ref(true);
@@ -92,7 +92,7 @@ onUnmounted(() => {
                 >
                   -15
                 </UButton>
-                <div class="text-3xl font-semibold">
+                <div class="text-xl font-semibold">
                   {{ formattedTime }}
                 </div>
                 <UButton
@@ -103,7 +103,7 @@ onUnmounted(() => {
                   +15
                 </UButton>
               </div>
-              <div class="rounded-full bg-(--ui-bg-accented) w-full mt-1">
+              <div class="rounded-full bg-(--ui-bg-accented) w-full mt-2">
                 <div
                   class="h-1 bg-(--ui-primary)"
                   :style="{ width: `${(timeLeft / maxTime) * 100}%` }"
