@@ -14,6 +14,7 @@ type ChangeExerciseData = {
 
 const workoutStore = useWorkoutStore();
 const exerciseStore = useExerciseStore();
+const timerStore = useTimerStore();
 const router = useRouter();
 
 const modalExerciseOpen = ref(false);
@@ -22,7 +23,7 @@ const changeExerciseModalOpen = ref(false);
 const changeExerciseData = ref<ChangeExerciseData | undefined>();
 const editWorkoutModalOpen = ref(false);
 const editWorkoutForm = ref({ name: "", notes: "", focus: "" });
-const timerOpen = ref(false);
+const timerOpen = ref(timerStore.isRunning);
 
 onMounted(() => {
   if (!workoutStore.workout) router.push("/");

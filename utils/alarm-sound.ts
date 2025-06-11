@@ -1,5 +1,5 @@
 // what the heck is this i don't even know
-export class AlarmSound {
+class AlarmSound {
   private audioContext: AudioContext | null = null;
   private activeOscillators: OscillatorNode[] = [];
 
@@ -90,11 +90,11 @@ export class AlarmSound {
 }
 
 // Create a singleton instance
-let alarmInstance: AlarmSound | null = null;
+let alarmSoundInstance: AlarmSound | null = null;
 
-export function useAlarm() {
-  if (!alarmInstance) {
-    alarmInstance = new AlarmSound();
+export function createAlarmSound() {
+  if (!alarmSoundInstance) {
+    alarmSoundInstance = new AlarmSound();
   }
-  return alarmInstance;
+  return alarmSoundInstance;
 }

@@ -4,4 +4,3 @@
 - optimistic updates
 - open override modal when there is workout in progress
 - add new exercise from workout page
-- keep rest timer running outside workout page

@@ -4,74 +4,27 @@ interface Emits {
 }
 
 const emit = defineEmits<Emits>();
+const timerStore = useTimerStore();
 
-const DEFAULT_MAX_TIME = 120;
+function cancelTimer() {
+  timerStore.stopTimer();
+  emit("close");
+}
 
-const timeLeft = ref(DEFAULT_MAX_TIME);
-const isRunning = ref(true);
-const intervalId = ref(0);
-const maxTime = ref(DEFAULT_MAX_TIME);
-
-// Initialize alarm sound utility
-const alarm = useAlarm();
-
-const formattedTime = computed(() => {
-  const minutes = Math.floor(timeLeft.value / 60);
-  const seconds = timeLeft.value % 60;
-  return `${minutes.toString().padStart(2, "0")}:${seconds
-    .toString()
-    .padStart(2, "0")}`;
-});
-
-function startTimer(seconds: number) {
-  timeLeft.value = seconds;
-  isRunning.value = true;
-
-  intervalId.value = window.setInterval(() => {
-    timeLeft.value--;
-
-    if (timeLeft.value <= 0) {
-      stopTimer();
-      alarm.play();
-
+// Auto-close timer when it reaches zero
+watch(
+  () => timerStore.timeLeft,
+  (newTime) => {
+    if (newTime <= 0 && !timerStore.isRunning) {
       setTimeout(() => {
         emit("close");
       }, 1000);
     }
-  }, 1000);
-}
-
-function stopTimer() {
-  clearInterval(intervalId.value);
-  alarm.stop();
-  timeLeft.value = 0;
-  isRunning.value = false;
-  maxTime.value = DEFAULT_MAX_TIME;
-}
-
-function addTime(time = 15) {
-  const left = timeLeft.value + time;
-  timeLeft.value = left;
-  if (left > maxTime.value) {
-    maxTime.value = left;
   }
-}
-
-function reduceTime(time = 15) {
-  const left = timeLeft.value - time;
-  timeLeft.value = left < 0 ? 0 : left;
-}
-
-function cancelTimer() {
-  emit("close");
-}
+);
 
 onMounted(() => {
-  startTimer(DEFAULT_MAX_TIME);
-});
-
-onUnmounted(() => {
-  stopTimer();
+  timerStore.startTimer();
 });
 </script>
 
@@ -87,26 +40,28 @@ onUnmounted(() => {
               <div class="flex justify-center items-center gap-2">
                 <UButton
                   variant="ghost"
-                  :disabled="!isRunning"
-                  @click="reduceTime()"
+                  :disabled="!timerStore.isRunning"
+                  @click="timerStore.reduceTime()"
                 >
                   -15
                 </UButton>
                 <div class="text-xl font-semibold">
-                  {{ formattedTime }}
+                  {{ timerStore.formattedTime }}
                 </div>
                 <UButton
                   variant="ghost"
-                  :disabled="!isRunning"
-                  @click="addTime()"
+                  :disabled="!timerStore.isRunning"
+                  @click="timerStore.addTime()"
                 >
                   +15
                 </UButton>
               </div>
               <div class="rounded-full bg-(--ui-bg-accented) w-full mt-2">
                 <div
-                  class="h-1 bg-(--ui-primary)"
-                  :style="{ width: `${(timeLeft / maxTime) * 100}%` }"
+                  class="h-1 bg-(--ui-primary) transition-transform duration-300 origin-left rounded-full"
+                  :style="`transform: scaleX(${
+                    timerStore.timeLeft / timerStore.maxTime
+                  })`"
                 />
               </div>
             </div>
