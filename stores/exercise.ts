@@ -22,25 +22,34 @@ export interface Exercise {
 export const useExerciseStore = defineStore("exercise", () => {
   const queryCache = useQueryCache();
 
-  const { data: exercises } = useQuery<Exercise[]>({
+  const { data: exercises, refresh } = useQuery<Exercise[]>({
     key: ["exercises"],
     query: () => fetchExercises(),
   });
 
   const { mutate: addExerciseTemp } = useMutation({
     mutation: (name: string) => addExercise(name),
-    onSettled: () => queryCache.invalidateQueries({ key: ["exercises"] }),
+    onSettled: () => {
+      queryCache.invalidateQueries({ key: ["exercises"] });
+      refresh();
+    },
   });
 
   const { mutate: editExerciseTemp } = useMutation({
     mutation: (param: { id: string; name: string }) =>
       editExercise(param.id, param.name),
-    onSettled: () => queryCache.invalidateQueries({ key: ["exercises"] }),
+    onSettled: () => {
+      queryCache.invalidateQueries({ key: ["exercises"] });
+      refresh();
+    },
   });
 
   const { mutate: deleteExerciseTemp } = useMutation({
     mutation: (id: string) => deleteExercise(id),
-    onSettled: () => queryCache.invalidateQueries({ key: ["exercises"] }),
+    onSettled: () => {
+      queryCache.invalidateQueries({ key: ["exercises"] });
+      refresh();
+    },
   });
 
   function add(name: string) {

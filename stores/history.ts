@@ -25,7 +25,7 @@ export const useHistoryStore = defineStore("history", () => {
 
   const activeProfileId = computed(() => profileStore.active?.id);
 
-  const { data: histories } = useQuery<WorkoutHistory[]>({
+  const { data: histories, refresh } = useQuery<WorkoutHistory[]>({
     key: () => ["histories", activeProfileId.value || ""],
     query: () => fetchHistories(activeProfileId.value),
   });
@@ -33,12 +33,18 @@ export const useHistoryStore = defineStore("history", () => {
   const { mutate: addHistoryTemp } = useMutation({
     mutation: (param: { profile: string; workout: Workout }) =>
       addHistory(param.profile, param.workout),
-    onSettled: () => queryCache.invalidateQueries({ key: ["histories"] }),
+    onSettled: () => {
+      refresh();
+      queryCache.invalidateQueries({ key: ["histories"] });
+    },
   });
 
   const { mutate: deleteHistoryTemp } = useMutation({
     mutation: (id: string) => deleteHistory(id),
-    onSettled: () => queryCache.invalidateQueries({ key: ["histories"] }),
+    onSettled: () => {
+      refresh();
+      queryCache.invalidateQueries({ key: ["histories"] });
+    },
   });
 
   function add(workout: Workout) {

@@ -23,7 +23,7 @@ export const useRecordStore = defineStore("record", () => {
 
   const activeProfileId = computed(() => profileStore.active?.id);
 
-  const { data: records } = useQuery({
+  const { data: records, refresh } = useQuery({
     key: () => ["records", activeProfileId.value || ""],
     query: () => fetchRecords(activeProfileId.value),
   });
@@ -34,10 +34,12 @@ export const useRecordStore = defineStore("record", () => {
       workout: Workout;
       records?: ExerciseRecords;
     }) => updateRecords(param.profile, param.workout, param.records),
-    onSettled: () =>
+    onSettled: () => {
+      refresh();
       queryCache.invalidateQueries({
         key: ["records", activeProfileId.value || ""],
-      }),
+      });
+    },
   });
 
   function update(workout: Workout) {

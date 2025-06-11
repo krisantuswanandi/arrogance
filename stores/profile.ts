@@ -22,25 +22,34 @@ interface Profile {
 export const useProfileStore = defineStore("profile", () => {
   const queryCache = useQueryCache();
 
-  const { data: profiles } = useQuery<Profile[]>({
+  const { data: profiles, refresh } = useQuery<Profile[]>({
     key: ["profiles"],
     query: () => fetchProfiles(),
   });
 
   const { mutate: addProfileTemp } = useMutation({
     mutation: (name: string) => addProfile(name),
-    onSettled: () => queryCache.invalidateQueries({ key: ["profiles"] }),
+    onSettled: () => {
+      refresh();
+      queryCache.invalidateQueries({ key: ["profiles"] });
+    },
   });
 
   const { mutate: editProfileTemp } = useMutation({
     mutation: (param: { id: string; name: string }) =>
       editProfile(param.id, param.name),
-    onSettled: () => queryCache.invalidateQueries({ key: ["profiles"] }),
+    onSettled: () => {
+      refresh();
+      queryCache.invalidateQueries({ key: ["profiles"] });
+    },
   });
 
   const { mutate: deleteProfileTemp } = useMutation({
     mutation: (id: string) => deleteProfile(id),
-    onSettled: () => queryCache.invalidateQueries({ key: ["profiles"] }),
+    onSettled: () => {
+      refresh();
+      queryCache.invalidateQueries({ key: ["profiles"] });
+    },
   });
 
   const activeProfileId = useLocalStorage("active-profile", "");
@@ -55,7 +64,7 @@ export const useProfileStore = defineStore("profile", () => {
     if (!profiles.value) return null;
 
     return profiles.value.find(
-      (profile) => profile.id === activeProfileId.value,
+      (profile) => profile.id === activeProfileId.value
     )!;
   });
 

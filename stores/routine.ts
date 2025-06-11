@@ -23,7 +23,7 @@ export interface Routine {
 export const useRoutineStore = defineStore("routine", () => {
   const queryCache = useQueryCache();
 
-  const { data: routines } = useQuery<Routine[]>({
+  const { data: routines, refresh } = useQuery<Routine[]>({
     key: ["routines"],
     query: () => fetchRoutines(),
   });
@@ -31,18 +31,27 @@ export const useRoutineStore = defineStore("routine", () => {
   const { mutate: addRoutineTemp } = useMutation({
     mutation: (param: { name: string; exerciseIds: string[] }) =>
       addRoutine(param.name, param.exerciseIds),
-    onSettled: () => queryCache.invalidateQueries({ key: ["routines"] }),
+    onSettled: () => {
+      refresh();
+      queryCache.invalidateQueries({ key: ["routines"] });
+    },
   });
 
   const { mutate: editRoutineTemp } = useMutation({
     mutation: (param: { id: string; name: string; exerciseIds: string[] }) =>
       editRoutine(param.id, param.name, param.exerciseIds),
-    onSettled: () => queryCache.invalidateQueries({ key: ["routines"] }),
+    onSettled: () => {
+      refresh();
+      queryCache.invalidateQueries({ key: ["routines"] });
+    },
   });
 
   const { mutate: deleteRoutineTemp } = useMutation({
     mutation: (id: string) => deleteRoutine(id),
-    onSettled: () => queryCache.invalidateQueries({ key: ["routines"] }),
+    onSettled: () => {
+      refresh();
+      queryCache.invalidateQueries({ key: ["routines"] });
+    },
   });
 
   function add(name: string, exerciseIds: string[]) {
@@ -73,7 +82,7 @@ export const useRoutineStore = defineStore("routine", () => {
         exercises: exerciseIds
           .map((exerciseId) => {
             const exercise = exercises.find(
-              (exercise) => exercise.id === exerciseId,
+              (exercise) => exercise.id === exerciseId
             );
             return exercise;
           })
