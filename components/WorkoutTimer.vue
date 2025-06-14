@@ -14,8 +14,8 @@ function cancelTimer() {
 // Auto-close timer when it reaches zero
 watch(
   () => timerStore.timeLeft,
-  (newTime) => {
-    if (newTime <= 0 && !timerStore.isRunning) {
+  (timeLeft) => {
+    if (timeLeft <= 0 && !timerStore.isRunning) {
       setTimeout(() => {
         emit("close");
       }, 1000);
@@ -56,11 +56,13 @@ onMounted(() => {
                   +15
                 </UButton>
               </div>
-              <div class="rounded-full bg-(--ui-bg-accented) w-full mt-2">
+              <div
+                class="rounded-full bg-(--ui-bg-accented) w-full mt-2 overflow-clip"
+              >
                 <div
-                  class="h-1 bg-(--ui-primary) transition-transform duration-300 origin-left rounded-full"
+                  class="h-1 bg-(--ui-primary) origin-left"
                   :style="`transform: scaleX(${
-                    timerStore.timeLeft / timerStore.maxTime
+                    timerStore.timeLeft / timerStore.progressLimit
                   })`"
                 />
               </div>

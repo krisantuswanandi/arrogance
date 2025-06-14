@@ -1,70 +1,84 @@
 import { format } from "date-fns";
 
-const DEFAULT_MAX_TIME = 120;
+const DEFAULT_TIMER_DURATION = 5_000;
 
 export const useTimerStore = defineStore("timer", () => {
   const timeLeft = ref(0);
   const isRunning = ref(false);
-  const intervalId = ref(0);
-  const maxTime = ref(DEFAULT_MAX_TIME);
+  const animationId = ref(0);
+  const duration = ref(0);
+  const progressLimit = ref(0);
+  const startTime = ref(0);
 
   // Initialize alarm sound utility
   const alarmSound = createAlarmSound();
 
   const formattedTime = computed(() => {
-    const date = new Date(timeLeft.value * 1000);
+    const date = new Date(timeLeft.value);
     return format(date, "mm:ss");
   });
 
-  function startTimer(seconds: number = DEFAULT_MAX_TIME) {
+  function updateTimer(currentTime: number) {
+    if (!isRunning.value) return;
+
+    const elapsed = Math.floor(currentTime - startTime.value);
+    const remaining = Math.max(0, duration.value - elapsed);
+
+    timeLeft.value = remaining;
+    if (remaining <= 0) {
+      stopTimer();
+      alarmSound.play();
+    } else {
+      animationId.value = requestAnimationFrame(updateTimer);
+    }
+  }
+
+  function startTimer(_duration = DEFAULT_TIMER_DURATION) {
     if (isRunning.value) return;
 
-    timeLeft.value = seconds;
-    maxTime.value = seconds;
+    timeLeft.value = _duration;
+    duration.value = _duration;
+    progressLimit.value = _duration;
+    startTime.value = performance.now();
     isRunning.value = true;
 
-    if (intervalId.value) {
-      clearInterval(intervalId.value);
+    if (animationId.value) {
+      cancelAnimationFrame(animationId.value);
     }
 
-    intervalId.value = window.setInterval(() => {
-      timeLeft.value--;
-
-      if (timeLeft.value <= 0) {
-        stopTimer();
-        alarmSound.play();
-      }
-    }, 1000);
+    animationId.value = requestAnimationFrame(updateTimer);
   }
 
   function stopTimer() {
-    if (intervalId.value) {
-      clearInterval(intervalId.value);
-      intervalId.value = 0;
+    if (animationId.value) {
+      cancelAnimationFrame(animationId.value);
+      animationId.value = 0;
     }
     alarmSound.stop();
     timeLeft.value = 0;
     isRunning.value = false;
-    maxTime.value = DEFAULT_MAX_TIME;
+    duration.value = DEFAULT_TIMER_DURATION;
+    progressLimit.value = DEFAULT_TIMER_DURATION;
+    startTime.value = 0;
   }
 
-  function addTime(time = 15) {
-    const left = timeLeft.value + time;
-    timeLeft.value = left;
-    if (left > maxTime.value) {
-      maxTime.value = left;
-    }
+  function addTime(time = 15_000) {
+    progressLimit.value = Math.max(
+      DEFAULT_TIMER_DURATION,
+      timeLeft.value + time
+    );
+    startTime.value += time;
   }
 
-  function reduceTime(time = 15) {
-    const left = timeLeft.value - time;
-    timeLeft.value = left < 0 ? 0 : left;
+  function reduceTime(time = 15_000) {
+    startTime.value -= time;
   }
 
   return {
     timeLeft,
     isRunning,
-    maxTime,
+    duration,
+    progressLimit,
     formattedTime,
     startTimer,
     stopTimer,
