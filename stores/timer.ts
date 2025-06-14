@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 
-const DEFAULT_TIMER_DURATION = 5_000;
+const DEFAULT_TIMER_DURATION = 120_000;
 
 export const useTimerStore = defineStore("timer", () => {
   const timeLeft = ref(0);

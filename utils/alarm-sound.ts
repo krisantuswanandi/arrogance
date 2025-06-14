@@ -29,14 +29,9 @@ class AlarmSound {
     oscillator.frequency.value = frequency;
     oscillator.type = "sine";
 
-    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime + delay);
     gainNode.gain.linearRampToValueAtTime(
-      0.3,
-      this.audioContext.currentTime + delay + 0.01
-    );
-    gainNode.gain.exponentialRampToValueAtTime(
-      0.01,
-      this.audioContext.currentTime + delay + duration
+      1,
+      this.audioContext.currentTime + delay
     );
 
     // Track active oscillators
@@ -65,10 +60,9 @@ class AlarmSound {
       await this.audioContext.resume();
     }
 
-    // Play alarm pattern: high-low-high-low sequence repeated
-    const pattern = [1000, 1000, 1000]; // Frequencies
+    const pattern = [1000, 1000, 1000]; // Frequencies (alarm pattern)
     const toneDuration = 0.1; // Duration of each beep
-    const pauseDuration = 0.1; // Pause between beeps
+    const pauseDuration = 0.1; // Distance between beeps
 
     pattern.forEach((frequency, index) => {
       const delay = index * (toneDuration + pauseDuration);
