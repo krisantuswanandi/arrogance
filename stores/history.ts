@@ -30,7 +30,7 @@ export const useHistoryStore = defineStore("history", () => {
     query: () => fetchHistories(activeProfileId.value),
   });
 
-  const { mutate: addHistoryTemp } = useMutation({
+  const { mutateAsync: addHistoryTemp } = useMutation({
     mutation: (param: { profile: string; workout: Workout }) =>
       addHistory(param.profile, param.workout),
     onSettled: () => {
@@ -39,7 +39,7 @@ export const useHistoryStore = defineStore("history", () => {
     },
   });
 
-  const { mutate: deleteHistoryTemp } = useMutation({
+  const { mutateAsync: deleteHistoryTemp } = useMutation({
     mutation: (id: string) => deleteHistory(id),
     onSettled: () => {
       refresh();

@@ -4,3 +4,5 @@
 - optimistic updates
 - open override modal when there is workout in progress
 - add new exercise from workout page
+- loading state on everything
+- empty state for everything

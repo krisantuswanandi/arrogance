@@ -27,7 +27,7 @@ export const useProfileStore = defineStore("profile", () => {
     query: () => fetchProfiles(),
   });
 
-  const { mutate: addProfileTemp } = useMutation({
+  const { mutateAsync: addProfileTemp } = useMutation({
     mutation: (name: string) => addProfile(name),
     onSettled: () => {
       refresh();
@@ -35,7 +35,7 @@ export const useProfileStore = defineStore("profile", () => {
     },
   });
 
-  const { mutate: editProfileTemp } = useMutation({
+  const { mutateAsync: editProfileTemp } = useMutation({
     mutation: (param: { id: string; name: string }) =>
       editProfile(param.id, param.name),
     onSettled: () => {
@@ -44,7 +44,7 @@ export const useProfileStore = defineStore("profile", () => {
     },
   });
 
-  const { mutate: deleteProfileTemp } = useMutation({
+  const { mutateAsync: deleteProfileTemp } = useMutation({
     mutation: (id: string) => deleteProfile(id),
     onSettled: () => {
       refresh();

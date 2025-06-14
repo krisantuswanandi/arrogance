@@ -28,7 +28,7 @@ export const useRoutineStore = defineStore("routine", () => {
     query: () => fetchRoutines(),
   });
 
-  const { mutate: addRoutineTemp } = useMutation({
+  const { mutateAsync: addRoutineTemp } = useMutation({
     mutation: (param: { name: string; exerciseIds: string[] }) =>
       addRoutine(param.name, param.exerciseIds),
     onSettled: () => {
@@ -37,7 +37,7 @@ export const useRoutineStore = defineStore("routine", () => {
     },
   });
 
-  const { mutate: editRoutineTemp } = useMutation({
+  const { mutateAsync: editRoutineTemp } = useMutation({
     mutation: (param: { id: string; name: string; exerciseIds: string[] }) =>
       editRoutine(param.id, param.name, param.exerciseIds),
     onSettled: () => {
@@ -46,7 +46,7 @@ export const useRoutineStore = defineStore("routine", () => {
     },
   });
 
-  const { mutate: deleteRoutineTemp } = useMutation({
+  const { mutateAsync: deleteRoutineTemp } = useMutation({
     mutation: (id: string) => deleteRoutine(id),
     onSettled: () => {
       refresh();

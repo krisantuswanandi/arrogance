@@ -28,7 +28,7 @@ export const useRecordStore = defineStore("record", () => {
     query: () => fetchRecords(activeProfileId.value),
   });
 
-  const { mutate: updateRecordsTemp } = useMutation({
+  const { mutateAsync: updateRecordsTemp } = useMutation({
     mutation: (param: {
       profile: string;
       workout: Workout;

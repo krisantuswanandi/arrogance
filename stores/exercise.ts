@@ -27,7 +27,7 @@ export const useExerciseStore = defineStore("exercise", () => {
     query: () => fetchExercises(),
   });
 
-  const { mutate: addExerciseTemp } = useMutation({
+  const { mutateAsync: addExerciseTemp } = useMutation({
     mutation: (name: string) => addExercise(name),
     onSettled: () => {
       queryCache.invalidateQueries({ key: ["exercises"] });
@@ -35,7 +35,7 @@ export const useExerciseStore = defineStore("exercise", () => {
     },
   });
 
-  const { mutate: editExerciseTemp } = useMutation({
+  const { mutateAsync: editExerciseTemp } = useMutation({
     mutation: (param: { id: string; name: string }) =>
       editExercise(param.id, param.name),
     onSettled: () => {
@@ -44,7 +44,7 @@ export const useExerciseStore = defineStore("exercise", () => {
     },
   });
 
-  const { mutate: deleteExerciseTemp } = useMutation({
+  const { mutateAsync: deleteExerciseTemp } = useMutation({
     mutation: (id: string) => deleteExercise(id),
     onSettled: () => {
       queryCache.invalidateQueries({ key: ["exercises"] });
@@ -52,8 +52,8 @@ export const useExerciseStore = defineStore("exercise", () => {
     },
   });
 
-  function add(name: string) {
-    addExerciseTemp(name);
+  async function add(name: string) {
+    return addExerciseTemp(name);
   }
 
   function edit(id: string, name: string) {
@@ -92,16 +92,25 @@ async function fetchExercises() {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-async function addExercise(name: string) {
+async function addExercise(name: string): Promise<Exercise> {
   const db = getFirestore();
   const auth = getAuth();
   const docRef = collection(db, "exercises");
-  await addDoc(docRef, {
+
+  const exerciseData = {
     name,
     uid: auth.currentUser?.uid,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
-  });
+  };
+  const res = await addDoc(docRef, exerciseData);
+
+  return {
+    ...exerciseData,
+    id: res.id,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 }
 
 async function editExercise(id: string, name: string) {
