@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 
-const DEFAULT_MAX_TIME = 5;
+const DEFAULT_MAX_TIME = 120;
 
 export const useTimerStore = defineStore("timer", () => {
   const timeLeft = ref(0);
