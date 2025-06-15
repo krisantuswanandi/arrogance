@@ -16,6 +16,7 @@ const workoutStore = useWorkoutStore();
 const exerciseStore = useExerciseStore();
 const timerStore = useTimerStore();
 const router = useRouter();
+const toast = useToast();
 
 const modalExerciseOpen = ref(false);
 const modalExerciseData = ref<ModalExerciseData | undefined>();
@@ -25,11 +26,21 @@ const editWorkoutModalOpen = ref(false);
 const editWorkoutForm = ref({ name: "", notes: "", focus: "" });
 const timerOpen = ref(timerStore.isRunning);
 
+const newExerciseName = ref("");
+const newExerciseLoading = ref(false);
+const newExerciseMode = ref("");
+
 onMounted(() => {
   if (!workoutStore.workout) router.push("/");
 });
 
 const workout = computed(() => workoutStore.workout);
+
+const newOption = {
+  id: "new",
+  name: "New exercise",
+  icon: "lucide:plus",
+};
 
 // Filter out exercises that are already in the workout
 const availableExercises = computed(() => {
@@ -37,9 +48,11 @@ const availableExercises = computed(() => {
   if (!exerciseStore.exercises) return [];
 
   const workoutExerciseIds = workout.value.exercises.map((ex) => ex.id);
-  return exerciseStore.exercises.filter(
+  const filteredExercises = exerciseStore.exercises.filter(
     (ex) => !workoutExerciseIds.includes(ex.id)
   );
+
+  return [[newOption], filteredExercises];
 });
 
 // Get all exercises for the change exercise modal
@@ -55,23 +68,16 @@ const allExercisesExceptCurrent = computed(() => {
     .map((ex) => ex.id);
 
   // Only show exercises that aren't already in the workout
-  return exerciseStore.exercises.filter(
+  const filteredExercises = exerciseStore.exercises.filter(
     (ex) => !workoutExerciseIds.includes(ex.id)
   );
+
+  return [[newOption], filteredExercises];
 });
 
 watch(workout, (val) => {
   if (!val) router.push("/");
 });
-
-function handleExerciseSelect(exerciseId: string) {
-  if (!exerciseId) return;
-
-  workoutStore.addExercise(exerciseId, modalExerciseData.value);
-
-  modalExerciseOpen.value = false;
-  modalExerciseData.value = undefined;
-}
 
 function cancelWorkout() {
   workoutStore.cancelWorkout();
@@ -91,6 +97,21 @@ function openAddExercise(
   modalExerciseData.value = { targetExercise, position };
 }
 
+function handleExerciseSelect(exerciseId: string) {
+  if (!exerciseId) return;
+
+  if (exerciseId === "new") {
+    modalExerciseOpen.value = false;
+    openNewExerciseModal("add");
+    return;
+  }
+
+  workoutStore.addExercise(exerciseId, modalExerciseData.value);
+
+  modalExerciseOpen.value = false;
+  modalExerciseData.value = undefined;
+}
+
 function openChangeExercise(exercise: WorkoutExercise) {
   changeExerciseModalOpen.value = true;
   changeExerciseData.value = { exercise };
@@ -98,6 +119,12 @@ function openChangeExercise(exercise: WorkoutExercise) {
 
 function handleChangeExercise(newExerciseId: string) {
   if (!newExerciseId || !changeExerciseData.value) return;
+
+  if (newExerciseId === "new") {
+    changeExerciseModalOpen.value = false;
+    openNewExerciseModal("change");
+    return;
+  }
 
   workoutStore.changeExercise(changeExerciseData.value.exercise, newExerciseId);
 
@@ -126,6 +153,40 @@ function saveWorkoutEdit() {
   workout.value.notes = editWorkoutForm.value.notes;
 
   editWorkoutModalOpen.value = false;
+}
+
+function openNewExerciseModal(mode: string) {
+  newExerciseMode.value = mode;
+  newExerciseName.value = "";
+  newExerciseLoading.value = false;
+}
+
+async function addNewExercise(name: string, mode: string) {
+  newExerciseLoading.value = true;
+
+  const newExerciseId = await exerciseStore.add(name.trim());
+
+  if (!newExerciseId) {
+    newExerciseLoading.value = false;
+    return;
+  }
+
+  try {
+    if (mode === "add") {
+      handleExerciseSelect(newExerciseId);
+    } else if (mode === "change") {
+      handleChangeExercise(newExerciseId);
+    }
+  } catch {
+    toast.add({
+      description:
+        "New exercise is created, but failed to add to workout. Please add them manually from the list of exercises",
+      color: "error",
+    });
+  } finally {
+    newExerciseMode.value = "";
+    newExerciseName.value = "";
+  }
 }
 </script>
 
@@ -229,12 +290,14 @@ function saveWorkoutEdit() {
             class="w-full"
             label-key="name"
             value-key="id"
+            create-item
             :items="availableExercises"
             :search-input="{
               placeholder: 'Search exercises...',
               autofocus: true,
             }"
             @update:model-value="handleExerciseSelect"
+            @create="addNewExercise($event, 'add')"
           />
         </template>
       </UModal>
@@ -252,12 +315,14 @@ function saveWorkoutEdit() {
             class="w-full"
             label-key="name"
             value-key="id"
+            create-item
             :items="allExercisesExceptCurrent"
             :search-input="{
               placeholder: 'Search exercises...',
               autofocus: true,
             }"
             @update:model-value="handleChangeExercise"
+            @create="addNewExercise($event, 'change')"
           />
         </template>
       </UModal>
@@ -296,6 +361,35 @@ function saveWorkoutEdit() {
           <UButton type="submit" form="form">Save</UButton>
         </template>
       </UModal>
+
+      <UModal
+        :open="!!newExerciseMode"
+        title="Create exercise"
+        :ui="{ footer: 'justify-end' }"
+        @update:open="newExerciseMode = ''"
+      >
+        <template #body>
+          <form
+            id="form"
+            @submit.prevent="addNewExercise(newExerciseName, newExerciseMode)"
+          >
+            <UFormField label="Name">
+              <UInput v-model="newExerciseName" class="w-full" />
+            </UFormField>
+          </form>
+        </template>
+        <template #footer>
+          <UButton
+            type="submit"
+            form="form"
+            block
+            :loading="newExerciseLoading"
+          >
+            Save
+          </UButton>
+        </template>
+      </UModal>
+
       <WorkoutTimer v-if="timerOpen" @close="timerOpen = false" />
     </NuxtLayout>
   </div>

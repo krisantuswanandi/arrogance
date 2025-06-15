@@ -21,6 +21,7 @@ export interface Exercise {
 
 export const useExerciseStore = defineStore("exercise", () => {
   const queryCache = useQueryCache();
+  const toast = useToast();
 
   const { data: exercises } = useQuery<Exercise[]>({
     key: ["exercises"],
@@ -41,24 +42,13 @@ export const useExerciseStore = defineStore("exercise", () => {
       newExercises.sort((a, b) => a.name.localeCompare(b.name));
       queryCache.setQueryData(["exercises"], newExercises);
 
-      return { oldExercises, newExercises, newExercise };
+      return { oldExercises, newExercise };
     },
-    onError: (_error, _vars, { oldExercises, newExercises }) => {
-      if (newExercises === queryCache.getQueryData<Exercise[]>(["exercises"])) {
-        queryCache.setQueryData(["exercises"], oldExercises);
-      }
+    onError: (_error, _vars, { oldExercises }) => {
+      queryCache.setQueryData(["exercises"], oldExercises);
     },
     onSuccess: (data, _vars, { newExercise }) => {
-      const currentExercises =
-        queryCache.getQueryData<Exercise[]>(["exercises"]) || [];
-      const newExerciseIndex = currentExercises.findIndex(
-        (t) => t.id === newExercise.id
-      );
-      if (newExerciseIndex >= 0) {
-        const copy = currentExercises.slice();
-        copy.splice(newExerciseIndex, 1, data);
-        queryCache.setQueryData(["exercises"], copy);
-      }
+      newExercise.id = data;
     },
   });
 
@@ -81,12 +71,10 @@ export const useExerciseStore = defineStore("exercise", () => {
       newExercises.sort((a, b) => a.name.localeCompare(b.name));
       queryCache.setQueryData(["exercises"], newExercises);
 
-      return { oldExercises, newExercises };
+      return { oldExercises };
     },
-    onError: (_error, _vars, { oldExercises, newExercises }) => {
-      if (newExercises === queryCache.getQueryData<Exercise[]>(["exercises"])) {
-        queryCache.setQueryData(["exercises"], oldExercises);
-      }
+    onError: (_error, _vars, { oldExercises }) => {
+      queryCache.setQueryData(["exercises"], oldExercises);
     },
   });
 
@@ -98,16 +86,29 @@ export const useExerciseStore = defineStore("exercise", () => {
       const newExercises = oldExercises.filter((ex) => ex.id !== id);
       queryCache.setQueryData(["exercises"], newExercises);
 
-      return { oldExercises, newExercises };
+      return { oldExercises };
     },
-    onError: (_error, _vars, { oldExercises, newExercises }) => {
-      if (newExercises === queryCache.getQueryData<Exercise[]>(["exercises"])) {
-        queryCache.setQueryData(["exercises"], oldExercises);
-      }
+    onError: (_error, _vars, { oldExercises }) => {
+      queryCache.setQueryData(["exercises"], oldExercises);
     },
   });
 
   async function add(name: string) {
+    name = name.trim();
+
+    if (!name) {
+      toast.add({
+        description: "Please enter a valid exercise name.",
+        color: "error",
+      });
+      return;
+    }
+
+    if (exercises.value?.map((ex) => ex.name).includes(name)) {
+      toast.add({ description: "Exercise already exists.", color: "error" });
+      return;
+    }
+
     return addExerciseTemp(name);
   }
 
@@ -147,7 +148,7 @@ async function fetchExercises() {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-async function addExercise(name: string): Promise<Exercise> {
+async function addExercise(name: string): Promise<string> {
   const db = getFirestore();
   const auth = getAuth();
   const docRef = collection(db, "exercises");
@@ -160,12 +161,7 @@ async function addExercise(name: string): Promise<Exercise> {
   };
   const res = await addDoc(docRef, exerciseData);
 
-  return {
-    ...exerciseData,
-    id: res.id,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
+  return res.id;
 }
 
 async function editExercise(id: string, name: string) {
