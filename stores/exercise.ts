@@ -29,9 +29,37 @@ export const useExerciseStore = defineStore("exercise", () => {
 
   const { mutateAsync: addExerciseTemp } = useMutation({
     mutation: (name: string) => addExercise(name),
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: ["exercises"] });
-      refresh();
+    onMutate: (name: string) => {
+      // Optimistically update the cache
+      const oldExercises = queryCache.getQueryData<Exercise[]>(["exercises"]);
+      const newExercise: Exercise = {
+        id: crypto.randomUUID(),
+        name,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const newExercises: Exercise[] = [...(oldExercises || []), newExercise];
+      newExercises.sort((a, b) => a.name.localeCompare(b.name));
+      queryCache.setQueryData(["exercises"], newExercises);
+
+      return { oldExercises, newExercises, newExercise };
+    },
+    onError: (_error, _vars, { oldExercises, newExercises }) => {
+      if (newExercises === queryCache.getQueryData<Exercise[]>(["exercises"])) {
+        queryCache.setQueryData(["exercises"], oldExercises);
+      }
+    },
+    onSuccess: (data, _vars, { newExercise }) => {
+      const currentExercises =
+        queryCache.getQueryData<Exercise[]>(["exercises"]) || [];
+      const newExerciseIndex = currentExercises.findIndex(
+        (t) => t.id === newExercise.id
+      );
+      if (newExerciseIndex >= 0) {
+        const copy = currentExercises.slice();
+        copy.splice(newExerciseIndex, 1, data);
+        queryCache.setQueryData(["exercises"], copy);
+      }
     },
   });
 
