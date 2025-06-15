@@ -22,7 +22,7 @@ export interface Exercise {
 export const useExerciseStore = defineStore("exercise", () => {
   const queryCache = useQueryCache();
 
-  const { data: exercises, refresh } = useQuery<Exercise[]>({
+  const { data: exercises } = useQuery<Exercise[]>({
     key: ["exercises"],
     query: () => fetchExercises(),
   });
@@ -92,9 +92,18 @@ export const useExerciseStore = defineStore("exercise", () => {
 
   const { mutateAsync: deleteExerciseTemp } = useMutation({
     mutation: (id: string) => deleteExercise(id),
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: ["exercises"] });
-      refresh();
+    onMutate: (id: string) => {
+      const oldExercises =
+        queryCache.getQueryData<Exercise[]>(["exercises"]) || [];
+      const newExercises = oldExercises.filter((ex) => ex.id !== id);
+      queryCache.setQueryData(["exercises"], newExercises);
+
+      return { oldExercises, newExercises };
+    },
+    onError: (_error, _vars, { oldExercises, newExercises }) => {
+      if (newExercises === queryCache.getQueryData<Exercise[]>(["exercises"])) {
+        queryCache.setQueryData(["exercises"], oldExercises);
+      }
     },
   });
 
