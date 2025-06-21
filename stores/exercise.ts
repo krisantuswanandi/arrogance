@@ -9,7 +9,6 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  serverTimestamp,
 } from "firebase/firestore";
 
 export interface Exercise {
@@ -156,8 +155,8 @@ async function addExercise(name: string): Promise<string> {
   const exerciseData = {
     name,
     uid: auth.currentUser?.uid,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
   const res = await addDoc(docRef, exerciseData);
 
@@ -167,7 +166,7 @@ async function addExercise(name: string): Promise<string> {
 async function editExercise(id: string, name: string) {
   const db = getFirestore();
   const docRef = doc(db, "exercises", id);
-  await updateDoc(docRef, { name, updatedAt: serverTimestamp() });
+  await updateDoc(docRef, { name, updatedAt: new Date() });
 }
 
 async function deleteExercise(id: string) {

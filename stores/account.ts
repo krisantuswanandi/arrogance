@@ -3,12 +3,7 @@ import {
   signInAnonymously,
   getAdditionalUserInfo,
 } from "firebase/auth";
-import {
-  getFirestore,
-  addDoc,
-  collection,
-  serverTimestamp,
-} from "firebase/firestore";
+import { getFirestore, addDoc, collection } from "firebase/firestore";
 
 export interface Account {
   uid: string;
@@ -49,26 +44,26 @@ async function setupDefaultData(uid: string) {
     addDoc(profilesRef, {
       name: "Default",
       uid,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }),
     addDoc(exercisesRef, {
       name: "Bench Press",
       uid,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }),
     addDoc(exercisesRef, {
       name: "Deadlift",
       uid,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }),
     addDoc(exercisesRef, {
       name: "Squat",
       uid,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }),
   ]);
 }

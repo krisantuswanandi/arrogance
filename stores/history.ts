@@ -6,7 +6,6 @@ import {
   query,
   where,
   addDoc,
-  serverTimestamp,
   and,
   doc,
   deleteDoc,
@@ -104,8 +103,8 @@ async function addHistory(profile: string, workout: Workout) {
     workout,
     profile,
     uid: auth.currentUser?.uid,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
 }
 

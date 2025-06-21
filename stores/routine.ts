@@ -9,7 +9,6 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  serverTimestamp,
 } from "firebase/firestore";
 
 export interface Routine {
@@ -128,15 +127,15 @@ async function addRoutine(name: string, exerciseIds: string[]) {
     name,
     exerciseIds,
     uid: auth.currentUser?.uid,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
 }
 
 async function editRoutine(id: string, name: string, exerciseIds: string[]) {
   const db = getFirestore();
   const docRef = doc(db, "routines", id);
-  await updateDoc(docRef, { name, exerciseIds, updatedAt: serverTimestamp() });
+  await updateDoc(docRef, { name, exerciseIds, updatedAt: new Date() });
 }
 
 async function deleteRoutine(id: string) {

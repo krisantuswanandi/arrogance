@@ -9,7 +9,6 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  serverTimestamp,
 } from "firebase/firestore";
 
 interface Profile {
@@ -125,15 +124,15 @@ async function addProfile(name: string) {
   await addDoc(docRef, {
     name,
     uid: auth.currentUser?.uid,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
 }
 
 async function editProfile(id: string, name: string) {
   const db = getFirestore();
   const docRef = doc(db, "profiles", id);
-  await updateDoc(docRef, { name, updatedAt: serverTimestamp() });
+  await updateDoc(docRef, { name, updatedAt: new Date() });
 }
 
 async function deleteProfile(id: string) {

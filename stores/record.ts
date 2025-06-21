@@ -3,7 +3,6 @@ import {
   collection,
   getDocs,
   setDoc,
-  serverTimestamp,
   doc,
 } from "firebase/firestore";
 
@@ -95,8 +94,8 @@ async function updateRecords(
     setDoc(docRef, {
       bestSet: getBestSet(exercise.sets, lastRecord?.bestSet),
       lastSets: exercise.sets,
-      createdAt: lastRecord?.createdAt || serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      createdAt: lastRecord?.createdAt || new Date(),
+      updatedAt: new Date(),
       ...(exercise.notes && { lastNotes: exercise.notes }),
     });
   });
