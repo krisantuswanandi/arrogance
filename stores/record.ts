@@ -95,9 +95,9 @@ async function updateRecords(
     setDoc(docRef, {
       bestSet: getBestSet(exercise.sets, lastRecord?.bestSet),
       lastSets: exercise.sets,
-      lastNotes: exercise.notes,
       createdAt: lastRecord?.createdAt || serverTimestamp(),
       updatedAt: serverTimestamp(),
+      ...(exercise.notes && { lastNotes: exercise.notes }),
     });
   });
 
