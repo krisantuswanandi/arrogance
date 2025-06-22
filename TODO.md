@@ -1,7 +1,8 @@
 - save new routine when finishing workout (on hold, adding more unnecessary step when finishing workout)
-- add rest time timer in active workout
 - connect to google
 - optimistic updates (exercise done)
 - open override modal when there is workout in progress
 - loading state on everything
 - empty state for everything
+- history pagination
+- manual update best record
