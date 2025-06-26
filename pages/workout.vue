@@ -178,9 +178,11 @@ async function addNewExercise(name: string, mode: string) {
       handleChangeExercise(newExerciseId);
     }
   } catch {
+    logFirebase("workout_error", {
+      message: "Failed to add new exercise on workout page",
+    });
     toast.add({
-      description:
-        "New exercise is created, but failed to add to workout. Please add them manually from the list of exercises",
+      description: `New exercise '${name}' is successfully created, but failed to add to workout. Please refresh the page and try again`,
       color: "error",
     });
   } finally {

@@ -20,7 +20,6 @@ export function initFirebase() {
   };
 
   const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
 
   initializeFirestore(app, {
     localCache: persistentLocalCache({
@@ -28,5 +27,11 @@ export function initFirebase() {
     }),
   });
 
-  logEvent(analytics, "init_firebase");
+  logFirebase("init_firebase");
+}
+
+export function logFirebase(name: string, params?: Record<string, string>) {
+  const analytics = getAnalytics();
+
+  logEvent(analytics, name, params);
 }
