@@ -6,3 +6,5 @@
 - empty state for everything
 - history pagination
 - manual update best record
+- share record per exercise
+- share a profile's records

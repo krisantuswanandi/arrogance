@@ -15,6 +15,11 @@ const exerciseRecord = computed(
   () => recordStore.records?.[props.exerciseId] || null
 );
 
+// Editing state
+const isEditingBestSet = ref(false);
+const editWeight = ref(0);
+const editReps = ref(0);
+
 function getSetNumber(index: number) {
   if (!exerciseRecord.value) return 0;
 
@@ -29,6 +34,42 @@ function getSetNumber(index: number) {
   }
   return count;
 }
+
+function startEditing() {
+  if (!exerciseRecord.value) return;
+
+  isEditingBestSet.value = true;
+  editWeight.value = exerciseRecord.value.bestSet.weight;
+  editReps.value = exerciseRecord.value.bestSet.reps;
+}
+
+async function saveBestSet() {
+  if (!exerciseRecord.value) return;
+
+  try {
+    const newBestSet = {
+      weight: editWeight.value,
+      reps: editReps.value,
+      type: exerciseRecord.value.bestSet.type || "normal",
+    };
+
+    await recordStore.updateBestSetRecord(props.exerciseId, newBestSet);
+    isEditingBestSet.value = false;
+  } catch (error) {
+    console.error("Failed to update best set:", error);
+  }
+}
+
+function cancelEditing() {
+  isEditingBestSet.value = false;
+}
+
+watch(
+  () => props.open,
+  (newValue) => {
+    if (!newValue) cancelEditing();
+  }
+);
 </script>
 
 <template>
@@ -49,11 +90,62 @@ function getSetNumber(index: number) {
               >
                 <UIcon name="lucide:trophy" />
               </div>
-              <div>
-                {{ exerciseRecord.bestSet.weight }}
-                <span class="text-(--ui-text-muted)">kg x</span>
-                {{ exerciseRecord.bestSet.reps }}
-                <span class="text-(--ui-text-muted)">reps</span>
+
+              <!-- Display mode -->
+              <div
+                v-if="!isEditingBestSet"
+                class="flex items-center gap-2 flex-1"
+              >
+                <div>
+                  {{ exerciseRecord.bestSet.weight }}
+                  <span class="text-(--ui-text-muted)">kg x</span>
+                  {{ exerciseRecord.bestSet.reps }}
+                  <span class="text-(--ui-text-muted)">reps</span>
+                </div>
+                <UButton
+                  icon="lucide:pencil"
+                  variant="ghost"
+                  color="neutral"
+                  size="lg"
+                  class="p-1 text-(--ui-text-dimmed)"
+                  @click="startEditing"
+                />
+              </div>
+
+              <!-- Edit mode -->
+              <div v-else class="flex items-center gap-2 flex-1">
+                <UInput
+                  v-model.number="editWeight"
+                  type="number"
+                  size="xs"
+                  class="w-14"
+                />
+                <span class="text-(--ui-text-muted) text-sm">kg x</span>
+                <UInput
+                  v-model.number="editReps"
+                  type="number"
+                  size="xs"
+                  class="w-14"
+                />
+                <span class="text-(--ui-text-muted) text-sm">reps</span>
+                <div class="flex items-center gap-1">
+                  <UButton
+                    icon="lucide:circle-check"
+                    variant="ghost"
+                    color="neutral"
+                    size="xl"
+                    class="p-1 text-(--ui-text-dimmed)"
+                    @click="saveBestSet"
+                  />
+                  <UButton
+                    icon="lucide:circle-x"
+                    variant="ghost"
+                    color="neutral"
+                    size="xl"
+                    class="p-1 text-(--ui-text-dimmed)"
+                    @click="cancelEditing"
+                  />
+                </div>
               </div>
             </div>
           </div>

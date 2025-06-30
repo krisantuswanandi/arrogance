@@ -3,6 +3,7 @@ import {
   collection,
   getDocs,
   setDoc,
+  updateDoc,
   doc,
 } from "firebase/firestore";
 
@@ -41,6 +42,19 @@ export const useRecordStore = defineStore("record", () => {
     },
   });
 
+  const { mutateAsync: updateBestSetTemp } = useMutation({
+    mutation: (param: {
+      profile: string;
+      exerciseId: string;
+      bestSet: WorkoutSet;
+    }) => updateBestSet(param.profile, param.exerciseId, param.bestSet),
+    onSettled: () => {
+      queryCache.invalidateQueries({
+        key: ["records", activeProfileId.value || ""],
+      });
+    },
+  });
+
   function update(workout: Workout) {
     if (!activeProfileId.value) return;
 
@@ -51,9 +65,20 @@ export const useRecordStore = defineStore("record", () => {
     });
   }
 
+  function updateBestSetRecord(exerciseId: string, bestSet: WorkoutSet) {
+    if (!activeProfileId.value) return;
+
+    return updateBestSetTemp({
+      profile: activeProfileId.value,
+      exerciseId,
+      bestSet,
+    });
+  }
+
   return {
     records,
     update,
+    updateBestSetRecord,
   };
 });
 
@@ -101,6 +126,20 @@ async function updateRecords(
   });
 
   await Promise.all(recordsUpdate);
+}
+
+function updateBestSet(
+  profile: string,
+  exerciseId: string,
+  bestSet: WorkoutSet
+) {
+  const db = getFirestore();
+  const docRef = doc(db, "profiles", profile, "records", exerciseId);
+
+  return updateDoc(docRef, {
+    bestSet,
+    updatedAt: new Date(),
+  });
 }
 
 function getBestSet(currentSets: WorkoutSet[], currentBest?: WorkoutSet) {
