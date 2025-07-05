@@ -271,3 +271,9 @@ bun run build
 - Use VueUse composables for common functionality (localStorage, etc.)
 - Follow Nuxt UI component patterns for consistent styling
 - Implement proper TypeScript interfaces for all data structures
+
+## TODO List Management
+
+- **Complete Tasks**: When completing a feature from TODO.md, remove the item from the list to keep it short and simple
+- **Add Future Items**: When asking to hold features for later implementation, add them to TODO.md with appropriate context
+- **Keep It Clean**: The TODO list should always stay concise and actionable
