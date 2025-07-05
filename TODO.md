@@ -8,7 +8,6 @@
 - manual update best record
 - share record per exercise
 - share a profile's records
-- edit history name and desc
 - add notes to exercises
 - manifest.json just because
 - wake lock during workout (user setting)

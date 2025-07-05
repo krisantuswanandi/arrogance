@@ -9,6 +9,7 @@ import {
   and,
   doc,
   deleteDoc,
+  updateDoc,
 } from "firebase/firestore";
 
 export interface WorkoutHistory {
@@ -38,6 +39,15 @@ export const useHistoryStore = defineStore("history", () => {
     },
   });
 
+  const { mutateAsync: updateHistoryTemp } = useMutation({
+    mutation: (param: { id: string; name: string; notes?: string }) =>
+      updateHistory(param.id, param.name, param.notes),
+    onSettled: () => {
+      refresh();
+      queryCache.invalidateQueries({ key: ["histories"] });
+    },
+  });
+
   const { mutateAsync: deleteHistoryTemp } = useMutation({
     mutation: (id: string) => deleteHistory(id),
     onSettled: () => {
@@ -52,6 +62,10 @@ export const useHistoryStore = defineStore("history", () => {
     addHistoryTemp({ profile: activeProfileId.value, workout });
   }
 
+  function update(id: string, name: string, notes?: string) {
+    updateHistoryTemp({ id, name, notes });
+  }
+
   function remove(id: string) {
     deleteHistoryTemp(id);
   }
@@ -63,6 +77,7 @@ export const useHistoryStore = defineStore("history", () => {
   return {
     histories,
     add,
+    update,
     remove,
     selectedHistory,
   };
@@ -112,4 +127,14 @@ async function deleteHistory(id: string) {
   const db = getFirestore();
   const docRef = doc(db, "histories", id);
   await deleteDoc(docRef);
+}
+
+async function updateHistory(id: string, name: string, notes?: string) {
+  const db = getFirestore();
+  const docRef = doc(db, "histories", id);
+  await updateDoc(docRef, {
+    "workout.name": name,
+    "workout.notes": notes,
+    updatedAt: new Date(),
+  });
 }

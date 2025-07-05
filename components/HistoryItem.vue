@@ -13,15 +13,41 @@ defineEmits<{
 const router = useRouter();
 const workoutStore = useWorkoutStore();
 const routineStore = useRoutineStore();
+const historyStore = useHistoryStore();
 
 const hasActiveWorkout = computed(() => !!workoutStore.workout);
 
 const saveAsRoutineModalOpen = ref(false);
+const editHistoryModalOpen = ref(false);
 const deleteModalOpen = ref(false);
 const routineName = ref("");
+const editHistoryForm = ref({ name: "", notes: "", focus: "" });
 
 function shareHistory() {
   shareWorkout(props.history);
+}
+
+function openEditHistory(focusTarget = "name") {
+  // Reset form data with current history values
+  editHistoryForm.value = {
+    name: props.history.workout.name,
+    notes: props.history.workout.notes || "",
+    focus: focusTarget,
+  };
+
+  editHistoryModalOpen.value = true;
+}
+
+function saveHistoryEdit() {
+  if (!editHistoryForm.value.name) return;
+
+  historyStore.update(
+    props.history.id,
+    editHistoryForm.value.name,
+    editHistoryForm.value.notes
+  );
+
+  editHistoryModalOpen.value = false;
 }
 
 const options: DropdownMenuItem[][] = [
@@ -40,6 +66,12 @@ const options: DropdownMenuItem[][] = [
       onSelect() {
         routineName.value = props.history.workout.name;
         saveAsRoutineModalOpen.value = true;
+      },
+    },
+    {
+      label: "Edit",
+      onSelect() {
+        openEditHistory();
       },
     },
     {
@@ -116,6 +148,40 @@ const truncatedNotes = computed(() => {
         Cancel
       </UButton>
       <UButton type="submit" form="routineForm">Save</UButton>
+    </template>
+  </UModal>
+  <UModal
+    v-model:open="editHistoryModalOpen"
+    title="Edit workout"
+    :ui="{ footer: 'justify-end' }"
+  >
+    <template #body>
+      <form id="editHistoryForm" @submit.prevent="saveHistoryEdit">
+        <UFormField label="Name">
+          <UInput
+            v-model="editHistoryForm.name"
+            :autofocus="editHistoryForm.focus === 'name'"
+            class="w-full"
+          />
+        </UFormField>
+        <UFormField label="Notes" class="mt-4">
+          <UTextarea
+            v-model="editHistoryForm.notes"
+            :autofocus="editHistoryForm.focus === 'notes'"
+            class="w-full"
+          />
+        </UFormField>
+      </form>
+    </template>
+    <template #footer>
+      <UButton
+        variant="outline"
+        color="neutral"
+        @click="editHistoryModalOpen = false"
+      >
+        Cancel
+      </UButton>
+      <UButton type="submit" form="editHistoryForm">Save</UButton>
     </template>
   </UModal>
   <UModal
