@@ -23,7 +23,12 @@ watch(
   }
 );
 
-onMounted(() => {
+onMounted(async () => {
+  // Request notification permission if not already granted
+  if ("Notification" in window && Notification.permission === "default") {
+    await timerStore.requestNotificationPermission();
+  }
+
   timerStore.startTimer();
 });
 </script>
