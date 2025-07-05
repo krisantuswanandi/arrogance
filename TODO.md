@@ -11,3 +11,6 @@
 - edit history name and desc
 - timer notif when browser is out of focus
 - add notes to exercises
+- manifest.json just because
+- wake lock during workout (user setting)
+- vibration on timer complete (user setting)
