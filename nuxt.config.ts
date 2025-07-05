@@ -31,10 +31,12 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: "Workout Log",
-      link: [{ rel: "icon", type: "image/svg-xml", href: "/logo.svg" }],
+      link: [
+        { rel: "icon", type: "image/svg+xml", href: "/logo.svg" },
+        { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+      ],
     },
   },
 
   ssr: false,
 });
-
