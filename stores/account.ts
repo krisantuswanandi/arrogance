@@ -41,6 +41,9 @@ export const useAccountStore = defineStore("account", () => {
 });
 
 async function setupDefaultData(uid: string) {
+  localStorage.removeItem("active-profile");
+  localStorage.removeItem("active-workout");
+
   const db = getFirestore();
 
   const profilesRef = collection(db, "profiles");
