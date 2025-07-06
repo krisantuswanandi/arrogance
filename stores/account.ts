@@ -9,6 +9,7 @@ import {
   collection,
   setDoc,
   doc,
+  updateDoc,
 } from "firebase/firestore";
 
 export interface Account {
@@ -26,6 +27,8 @@ export const useAccountStore = defineStore("account", () => {
       const additionalUserInfo = getAdditionalUserInfo(userCredential);
       if (additionalUserInfo?.isNewUser) {
         await setupDefaultData(userCredential.user.uid);
+      } else {
+        await updateLastActive(userCredential.user.uid);
       }
 
       account.value = userCredential.user;
@@ -40,7 +43,7 @@ export const useAccountStore = defineStore("account", () => {
   };
 });
 
-async function setupDefaultData(uid: string) {
+function setupDefaultData(uid: string) {
   localStorage.removeItem("active-profile");
   localStorage.removeItem("active-workout");
 
@@ -50,7 +53,7 @@ async function setupDefaultData(uid: string) {
   const exercisesRef = collection(db, "exercises");
   const userRef = doc(db, "users", uid);
 
-  await Promise.all([
+  return Promise.all([
     addDoc(profilesRef, {
       name: "Default",
       uid,
@@ -85,4 +88,13 @@ async function setupDefaultData(uid: string) {
       lastActive: new Date(),
     }),
   ]);
+}
+
+function updateLastActive(uid: string) {
+  const db = getFirestore();
+  const userRef = doc(db, "users", uid);
+
+  return updateDoc(userRef, {
+    lastActive: new Date(),
+  });
 }
