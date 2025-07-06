@@ -3,7 +3,13 @@ import {
   signInAnonymously,
   getAdditionalUserInfo,
 } from "firebase/auth";
-import { getFirestore, addDoc, collection } from "firebase/firestore";
+import {
+  getFirestore,
+  addDoc,
+  collection,
+  setDoc,
+  doc,
+} from "firebase/firestore";
 
 export interface Account {
   uid: string;
@@ -39,6 +45,7 @@ async function setupDefaultData(uid: string) {
 
   const profilesRef = collection(db, "profiles");
   const exercisesRef = collection(db, "exercises");
+  const userRef = doc(db, "users", uid);
 
   await Promise.all([
     addDoc(profilesRef, {
@@ -64,6 +71,15 @@ async function setupDefaultData(uid: string) {
       uid,
       createdAt: new Date(),
       updatedAt: new Date(),
+    }),
+    setDoc(userRef, {
+      uid,
+      name: "",
+      email: "",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastLogin: new Date(),
+      lastActive: new Date(),
     }),
   ]);
 }
