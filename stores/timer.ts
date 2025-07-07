@@ -25,11 +25,13 @@ export const useTimerStore = defineStore("timer", () => {
   // Show notification when timer completes
   const showTimerNotification = () => {
     if ("Notification" in window && Notification.permission === "granted") {
-      new Notification("Rest Timer Complete", {
-        body: "Time to get back to your workout!",
-        icon: "/logo.svg",
-        tag: "workout-timer",
-        requireInteraction: true,
+      navigator.serviceWorker.ready.then(function (registration) {
+        registration.showNotification("Time is up!", {
+          body: "Time to get back to your workout!",
+          icon: "/logo.svg",
+          tag: "workout-timer",
+          requireInteraction: true,
+        });
       });
     }
   };
