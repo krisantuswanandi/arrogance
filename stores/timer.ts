@@ -13,29 +13,6 @@ export const useTimerStore = defineStore("timer", () => {
   // Initialize alarm sound utility
   const alarmSound = createAlarmSound();
 
-  // Request notification permission
-  const requestNotificationPermission = async () => {
-    if ("Notification" in window) {
-      const permission = await Notification.requestPermission();
-      return permission === "granted";
-    }
-    return false;
-  };
-
-  // Show notification when timer completes
-  const showTimerNotification = () => {
-    if ("Notification" in window && Notification.permission === "granted") {
-      navigator.serviceWorker.ready.then(function (registration) {
-        registration.showNotification("Time is up!", {
-          body: "Time to get back to your workout!",
-          icon: "/logo.svg",
-          tag: "workout-timer",
-          requireInteraction: true,
-        });
-      });
-    }
-  };
-
   const formattedTime = computed(() => {
     const date = new Date(timeLeft.value);
     return format(date, "mm:ss");
@@ -51,7 +28,6 @@ export const useTimerStore = defineStore("timer", () => {
     if (remaining <= 0) {
       stopTimer();
       alarmSound.play();
-      showTimerNotification();
     } else {
       animationId.value = requestAnimationFrame(updateTimer);
     }
@@ -108,7 +84,5 @@ export const useTimerStore = defineStore("timer", () => {
     stopTimer,
     addTime,
     reduceTime,
-    requestNotificationPermission,
-    showTimerNotification,
   };
 });

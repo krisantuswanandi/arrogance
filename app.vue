@@ -5,9 +5,6 @@ const { isActive: isSplashActive } = useSplash();
 const accountStore = useAccountStore();
 
 initFirebase();
-
-// Register service worker for notification
-navigator.serviceWorker.register("/sw.js");
 </script>
 
 <template>
