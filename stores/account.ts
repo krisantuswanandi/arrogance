@@ -1,7 +1,12 @@
 import {
   getAuth,
   signInAnonymously,
+  signInWithPopup,
+  linkWithPopup,
   getAdditionalUserInfo,
+  GoogleAuthProvider,
+  type User,
+  type UserCredential,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -12,38 +17,79 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-export interface Account {
-  uid: string;
-}
-
 export const useAccountStore = defineStore("account", () => {
-  const account = ref<Account | null>(null);
+  const account = ref<User | null>(null);
 
-  async function login() {
+  function onLoad(callback: (user: User | null) => void) {
+    const auth = getAuth();
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        account.value = user;
+        updateLastActive(user);
+      }
+
+      callback(user);
+    });
+  }
+
+  async function loginAnonymously() {
     try {
       const auth = getAuth();
       const userCredential = await signInAnonymously(auth);
-
-      const additionalUserInfo = getAdditionalUserInfo(userCredential);
-      if (additionalUserInfo?.isNewUser) {
-        await setupDefaultData(userCredential.user.uid);
-      } else {
-        await updateLastActive(userCredential.user.uid);
-      }
-
+      await afterLogin(userCredential);
       account.value = userCredential.user;
-    } catch (error: unknown) {
-      console.error("login failed", error);
+      return userCredential.user;
+    } catch {
+      return null;
+    }
+  }
+
+  async function loginWithGoogle() {
+    try {
+      const auth = getAuth();
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      await afterLogin(userCredential);
+      account.value = userCredential.user;
+      return userCredential.user;
+    } catch {
+      return null;
+    }
+  }
+
+  async function linkToGoogle() {
+    try {
+      if (!account.value) return;
+
+      const provider = new GoogleAuthProvider();
+      const userCredential = await linkWithPopup(account.value, provider);
+      await updateAfterLink(userCredential.user);
+      account.value = userCredential.user;
+      return userCredential.user;
+    } catch {
+      return null;
     }
   }
 
   return {
     account,
-    login,
+    loginAnonymously,
+    loginWithGoogle,
+    linkToGoogle,
+    onLoad,
   };
 });
 
-function setupDefaultData(uid: string) {
+function afterLogin(userCredential: UserCredential) {
+  const additionalUserInfo = getAdditionalUserInfo(userCredential);
+  if (additionalUserInfo?.isNewUser) {
+    return setupDefaultData(userCredential.user);
+  } else {
+    return updateLastLogin(userCredential.user);
+  }
+}
+
+function setupDefaultData(user: User) {
   localStorage.removeItem("active-profile");
   localStorage.removeItem("active-workout");
 
@@ -51,37 +97,38 @@ function setupDefaultData(uid: string) {
 
   const profilesRef = collection(db, "profiles");
   const exercisesRef = collection(db, "exercises");
-  const userRef = doc(db, "users", uid);
+  const userRef = doc(db, "users", user.uid);
 
   return Promise.all([
     addDoc(profilesRef, {
       name: "Default",
-      uid,
+      uid: user.uid,
       createdAt: new Date(),
       updatedAt: new Date(),
     }),
     addDoc(exercisesRef, {
       name: "Bench Press",
-      uid,
+      uid: user.uid,
       createdAt: new Date(),
       updatedAt: new Date(),
     }),
     addDoc(exercisesRef, {
       name: "Deadlift",
-      uid,
+      uid: user.uid,
       createdAt: new Date(),
       updatedAt: new Date(),
     }),
     addDoc(exercisesRef, {
       name: "Squat",
-      uid,
+      uid: user.uid,
       createdAt: new Date(),
       updatedAt: new Date(),
     }),
     setDoc(userRef, {
-      uid,
-      name: "",
-      email: "",
+      uid: user.uid,
+      name: user.providerData[0]?.displayName || "",
+      email: user.providerData[0]?.email || "",
+      photo: user.providerData[0]?.photoURL || "",
       createdAt: new Date(),
       updatedAt: new Date(),
       lastLogin: new Date(),
@@ -90,11 +137,31 @@ function setupDefaultData(uid: string) {
   ]);
 }
 
-function updateLastActive(uid: string) {
-  const db = getFirestore();
-  const userRef = doc(db, "users", uid);
-
-  return updateDoc(userRef, {
+function updateLastActive(user: User) {
+  return updateUserData(user.uid, {
     lastActive: new Date(),
   });
+}
+
+function updateLastLogin(user: User) {
+  return updateUserData(user.uid, {
+    lastLogin: new Date(),
+    lastActive: new Date(),
+  });
+}
+
+function updateAfterLink(user: User) {
+  return updateUserData(user.uid, {
+    name: user.providerData[0]?.displayName || "",
+    email: user.providerData[0]?.email || "",
+    photo: user.providerData[0]?.photoURL || "",
+    updatedAt: new Date(),
+    linkedToGoogle: new Date(),
+  });
+}
+
+function updateUserData(uid: string, data: Record<string, string | Date>) {
+  const db = getFirestore();
+  const userRef = doc(db, "users", uid);
+  return updateDoc(userRef, data);
 }

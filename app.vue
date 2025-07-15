@@ -1,17 +1,29 @@
 <script setup lang="ts">
 import { Analytics } from "@vercel/analytics/nuxt";
 
-const { isActive: isSplashActive } = useSplash();
+initFirebase();
+
+const route = useRoute();
+const router = useRouter();
+const ready = ref(false);
 const accountStore = useAccountStore();
 
-initFirebase();
+accountStore.onLoad((user) => {
+  if (route.name === "login" && !!user) {
+    router.push("/");
+  } else if (route.name !== "login" && !user) {
+    router.push("/login");
+  }
+
+  ready.value = true;
+});
 </script>
 
 <template>
   <UApp>
     <Analytics />
-    <AppSplash v-if="isSplashActive" />
-    <AppContainer v-if="!!accountStore.account" class="min-h-dvh">
+    <AppSplash v-if="!ready" />
+    <AppContainer v-else class="min-h-dvh">
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>
