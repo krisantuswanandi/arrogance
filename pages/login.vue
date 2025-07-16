@@ -4,7 +4,7 @@ definePageMeta({
 });
 
 const accountStore = useAccountStore();
-const { $router } = useNuxtApp();
+const router = useRouter();
 
 const isLoading = ref(false);
 
@@ -21,7 +21,7 @@ async function login(type = "") {
         user = await accountStore.loginAnonymously();
     }
 
-    if (user) $router.push("/");
+    if (user) router.push("/");
   } catch (error) {
     console.error("Login failed:", error);
   } finally {

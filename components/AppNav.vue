@@ -5,7 +5,7 @@ const navigationItems = ref<NavigationMenuItem[]>([
   { label: "Home", to: "/", icon: "lucide:house" },
   { label: "Routine", to: "/routines", icon: "lucide:clipboard-list" },
   { label: "Exercise", to: "/exercises", icon: "lucide:dumbbell" },
-  { label: "Profile", to: "/profiles", icon: "lucide:user-round" },
+  { label: "Account", to: "/account", icon: "lucide:user-round" },
 ]);
 </script>
 

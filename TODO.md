@@ -12,3 +12,5 @@
 - manifest.json just because
 - wake lock during workout (user setting)
 - vibration on timer complete (user setting)
+- sign out
+- link to registered google account
