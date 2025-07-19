@@ -90,9 +90,6 @@ function afterLogin(userCredential: UserCredential) {
 }
 
 function setupDefaultData(user: User) {
-  localStorage.removeItem("active-profile");
-  localStorage.removeItem("active-workout");
-
   const db = getFirestore();
 
   const profilesRef = collection(db, "profiles");

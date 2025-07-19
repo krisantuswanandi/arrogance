@@ -21,7 +21,13 @@ async function login(type = "") {
         user = await accountStore.loginAnonymously();
     }
 
-    if (user) router.push("/");
+    if (user) {
+      // remove any saved data
+      localStorage.removeItem("active-profile");
+      localStorage.removeItem("active-workout");
+
+      router.push("/");
+    }
   } catch (error) {
     console.error("Login failed:", error);
   } finally {
