@@ -10,6 +10,8 @@ import {
   doc,
   deleteDoc,
   updateDoc,
+  limit,
+  orderBy,
 } from "firebase/firestore";
 
 export interface WorkoutHistory {
@@ -92,7 +94,9 @@ async function fetchHistories(profile?: string) {
   const uidFilter = where("uid", "==", auth.currentUser?.uid);
   const profileFilter = where("profile", "==", profile);
   const filter = and(uidFilter, profileFilter);
-  const snap = await getDocs(query(docRef, filter));
+  const snap = await getDocs(
+    query(docRef, filter, orderBy("createdAt", "desc"), limit(15)),
+  );
   return snap.docs
     .map((doc) => {
       const data = doc.data();
