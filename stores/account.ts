@@ -71,11 +71,22 @@ export const useAccountStore = defineStore("account", () => {
     }
   }
 
+  async function logout() {
+    try {
+      const auth = getAuth();
+      await auth.signOut();
+      account.value = null;
+    } catch (error) {
+      return error
+    }
+  }
+
   return {
     account,
     loginAnonymously,
     loginWithGoogle,
     linkToGoogle,
+    logout,
     onLoad,
   };
 });

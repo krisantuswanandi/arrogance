@@ -31,6 +31,18 @@ function addProfile() {
   name.value = "";
   modalOpen.value = false;
 }
+
+async function logout() {
+  try {
+    isLoading.value = true;
+
+    await accountStore.logout();
+  } catch (error) {
+    console.error("Logout failed:", error);
+  } finally {
+    isLoading.value = false;
+  }
+}
 </script>
 
 <template>
@@ -83,6 +95,16 @@ function addProfile() {
           />
         </li>
       </ul>
+    </div>
+    <div class="mt-12 text-center">
+      <UButton
+        variant="ghost"
+        color="error"
+        :disabled="isLoading"
+        @click="logout"
+      >
+        Sign Out
+      </UButton>
     </div>
     <FloatingButton>
       <UButton icon="lucide:plus" class="shadow-lg" @click="modalOpen = true">
